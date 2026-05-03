@@ -1,12 +1,73 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CHECK LIST OPNAME BARANG – SLAKU</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CHECK LIST OPNAME BARANG – SLAKU</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <section class="hero card">
+      <h1>CHECK LIST OPNAME BARANG – SLAKU</h1>
+      <p class="subtitle">Checklist bahan baku, packaging, dan kebutuhan produksi Slaku.</p>
+      <p class="tiny">Untuk kontrol stok harian produksi minuman, bakery, dan dessert.</p>
+      <div class="hero-actions">
+        <button id="startTodayTop" class="btn primary">Mulai Opname Hari Ini</button>
+        <button id="seeChecklist" class="btn secondary">Lihat Checklist</button>
+      </div>
+    </section>
+
+    <section id="summaryCards" class="summary-grid"></section>
+
+    <section class="card section">
+      <h2>Info Opname Harian</h2>
+      <div class="grid">
+        <label>Tanggal<input id="opnameDate" type="date" /></label>
+        <label>Nama Staff<input id="staffName" type="text" placeholder="Isi nama staff" /></label>
+        <div class="autosave">Tersimpan otomatis</div>
+        <button id="startTodayInfo" class="btn primary">Mulai Opname Hari Ini</button>
+      </div>
+    </section>
+
+    <section class="card section">
+      <h2>Search & Filter</h2>
+      <div class="grid">
+        <input id="searchInput" type="text" placeholder="Cari nama item" />
+        <select id="categoryFilter"></select>
+        <select id="checkedFilter">
+          <option value="all">Semua Status Cek</option>
+          <option value="checked">Sudah Dicek</option>
+          <option value="unchecked">Belum Dicek</option>
+        </select>
+        <select id="statusFilter">
+          <option value="all">Semua Status Stok</option>
+          <option value="Aman">Aman</option>
+          <option value="Perlu Cek">Perlu Cek</option>
+          <option value="Kurang">Kurang</option>
+          <option value="Habis">Habis</option>
+        </select>
+      </div>
+    </section>
+
+    <section id="checklistSection" class="card section">
+      <div class="section-title-row">
+        <h2>Inventory Checklist</h2>
+        <button id="addItemBtn" class="btn primary">+ Tambah Item</button>
+      </div>
+      <div id="inventoryList"></div>
+    </section>
+
+    <section class="card section actions">
+      <button id="exportCsvBtn" class="btn primary">Export CSV</button>
+      <button id="printBtn" class="btn secondary">Print Checklist</button>
+      <button id="backupJsonBtn" class="btn secondary">Backup JSON</button>
+      <label class="btn secondary file-btn">Import JSON<input id="importJsonInput" type="file" accept="application/json" /></label>
+      <button id="resetDailyBtn" class="btn secondary">Reset Checklist Harian</button>
+      <button id="resetFullBtn" class="btn danger">Reset Penuh</button>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
 </html>
