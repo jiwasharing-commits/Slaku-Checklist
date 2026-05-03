@@ -6,7 +6,7 @@ const APP_USERNAME = 'slaku';
 const APP_PASSWORD = 'Solo713188';
 const LOGIN_KEY = 'slaku_logged_in';
 const RECAP_UI_KEY = 'slaku_recap_ui_v1';
-const defaultRecapUi = { mainOpen: true, onlineOpen: false, offlineOpen: false };
+const defaultRecapUi = { mainOpen: true, onlineOpen: false, lotteOpen: false, tokbinOpen: false, rizaputraOpen: false };
 let recapUi = loadRecapUi();
 
 const categories = {
@@ -96,7 +96,7 @@ function loadRecapUi() { try { return { ...defaultRecapUi, ...(JSON.parse(localS
 function saveRecapUi() { localStorage.setItem(RECAP_UI_KEY, JSON.stringify(recapUi)); }
 
 function needsBuy(item) { return Number(item.currentStock) < Number(item.minStock); }
-function normalize(item) { const currentStock = Number(item.currentStock) || 0; const minStock = Number(item.minStock) || 0; const defaultBuy = Math.max(minStock - currentStock, 0); return { ...item, currentStock, minStock, buyQty: Number(item.buyQty) || defaultBuy, checked: item.checked || currentStock < minStock, place: item.place || 'Online & Offline' }; }
+function normalize(item) { const currentStock = Number(item.currentStock) || 0; const minStock = Number(item.minStock) || 0; const defaultBuy = Math.max(minStock - currentStock, 0); return { ...item, currentStock, minStock, buyQty: Number(item.buyQty) || defaultBuy, checked: item.checked || currentStock < minStock, place: (() => { let place = item.place || 'Online'; if (place === 'Offline') place = 'Tokbin'; if (place === 'Online & Offline') place = 'Online'; if (!['Online','Lotte','Tokbin','RizaPutra'].includes(place)) place = 'Online'; return place; })() }; }
 function getStockStatus(item) { const current = Number(item.currentStock) || 0; const minimum = Number(item.minStock) || 0; if (current === 0) return { key: 'kosong', icon: '⛔', label: 'KOSONG' }; if (current > 0 && current < minimum) return { key: 'kurang', icon: '⚠️', label: 'KURANG' }; return { key: 'aman', icon: '✅', label: 'AMAN' }; }
 function getStockPercent(item) {
   const current = Number(item.currentStock) || 0;
@@ -134,7 +134,7 @@ function render() {
 function renderRow(item) {
   const st = getStockStatus(item);
   const pct = getStockPercent(item);
-  return `<div class="item"><label class="item-head"><input type="checkbox" data-id="${esc(item.id)}" class="check" ${item.checked ? 'checked' : ''}/><span>${esc(item.name)}</span><span class="status-badge status-${st.key}">${st.icon} ${st.label}</span></label><div class="stock-meta"><small class="stock-percent">Stok: ${Math.round(pct)}% dari minimal</small><div class="stock-bar"><div class="stock-fill stock-${st.key}" style="width:${pct}%"></div></div></div><div class="mini"><label>Stok Saat Ini<input type="number" min="0" step="1" inputmode="numeric" class="current" data-id="${esc(item.id)}" value="${item.currentStock}"/></label><label>Stok Minimal<input type="number" min="0" step="1" inputmode="numeric" class="min" data-id="${esc(item.id)}" value="${item.minStock}"/></label><label>Jumlah Dibeli<input type="number" min="0" step="1" inputmode="numeric" class="buy" data-id="${esc(item.id)}" value="${item.buyQty}"/></label><label>Tempat Beli<select class="place" data-id="${esc(item.id)}"><option ${item.place === 'Online' ? 'selected' : ''}>Online</option><option ${item.place === 'Offline' ? 'selected' : ''}>Offline</option><option ${item.place === 'Online & Offline' ? 'selected' : ''}>Online & Offline</option></select></label></div><div class="preset-wrap"><small>Preset stok</small><div class="preset-row">${[0,25,50,75,100].map(p=>`<button type="button" class="preset-btn" data-id="${esc(item.id)}" data-preset="${p}" ${p!==0 && Number(item.minStock)<=0 ? 'disabled' : ''}>${p}%</button>`).join('')}</div></div></div>`;
+  return `<div class="item"><label class="item-head"><input type="checkbox" data-id="${esc(item.id)}" class="check" ${item.checked ? 'checked' : ''}/><span>${esc(item.name)}</span><span class="status-badge status-${st.key}">${st.icon} ${st.label}</span></label><div class="stock-meta"><small class="stock-percent">Stok: ${Math.round(pct)}% dari minimal</small><div class="stock-bar"><div class="stock-fill stock-${st.key}" style="width:${pct}%"></div></div></div><div class="mini"><label>Stok Saat Ini<input type="number" min="0" step="1" inputmode="numeric" class="current" data-id="${esc(item.id)}" value="${item.currentStock}"/></label><label>Stok Minimal<input type="number" min="0" step="1" inputmode="numeric" class="min" data-id="${esc(item.id)}" value="${item.minStock}"/></label><label>Jumlah Dibeli<input type="number" min="0" step="1" inputmode="numeric" class="buy" data-id="${esc(item.id)}" value="${item.buyQty}"/></label><label>Tempat Beli<select class="place" data-id="${esc(item.id)}"><option ${item.place === 'Online' ? 'selected' : ''}>Online</option><option ${item.place === 'Lotte' ? 'selected' : ''}>Lotte</option><option ${item.place === 'Tokbin' ? 'selected' : ''}>Tokbin</option><option ${item.place === 'RizaPutra' ? 'selected' : ''}>RizaPutra</option></select></label></div><div class="preset-wrap"><small>Preset stok</small><div class="preset-row">${[0,25,50,75,100].map(p=>`<button type="button" class="preset-btn" data-id="${esc(item.id)}" data-preset="${p}" ${p!==0 && Number(item.minStock)<=0 ? 'disabled' : ''}>${p}%</button>`).join('')}</div></div></div>`;
 }
 
 function bindRowEvents() {
@@ -216,16 +216,16 @@ function getNeedBuyItems() { return items.filter(i => ['kosong', 'kurang'].inclu
 
 function renderRecap() {
   const needBuy = getNeedBuyItems();
-  const online = needBuy.filter(i => i.place === 'Online' || i.place === 'Online & Offline');
-  const offline = needBuy.filter(i => i.place === 'Offline' || i.place === 'Online & Offline');
+  const groups = {
+    Online: needBuy.filter(i => i.place === 'Online'),
+    Lotte: needBuy.filter(i => i.place === 'Lotte'),
+    Tokbin: needBuy.filter(i => i.place === 'Tokbin'),
+    RizaPutra: needBuy.filter(i => i.place === 'RizaPutra')
+  };
 
   recapHeaderMeta.textContent = `(${needBuy.length} item)`;
   recapHeaderIcon.textContent = recapUi.mainOpen ? '▴' : '▾';
-
-  if (!recapUi.mainOpen) {
-    recapList.innerHTML = '';
-    return;
-  }
+  if (!recapUi.mainOpen) { recapList.innerHTML = ''; return; }
 
   const renderGroup = (arr) => {
     if (!arr.length) return '<p>Tidak ada item.</p>';
@@ -234,22 +234,39 @@ function renderRecap() {
     return Object.entries(grouped).map(([cat, list]) => `<details open><summary>${esc(cat)} (${list.length})</summary><ul>${list.map(i => `<li>${getStockStatus(i).icon} ${getStockStatus(i).label} - ${esc(i.name)} | Stok: ${i.currentStock} | Minimal: ${i.minStock} | Beli: ${i.buyQty}</li>`).join('')}</ul></details>`).join('');
   };
 
-  const onlineContent = renderGroup(online);
-  const offlineContent = renderGroup(offline);
+  const entries = [
+    ['Online', 'onlineOpen', 'Rekap Beli Online'],
+    ['Lotte', 'lotteOpen', 'Rekap Beli Lotte'],
+    ['Tokbin', 'tokbinOpen', 'Rekap Beli Tokbin'],
+    ['RizaPutra', 'rizaputraOpen', 'Rekap Beli RizaPutra']
+  ];
 
-  recapList.innerHTML = `
-    <div class="recap-block">
-      <button class="recap-toggle" data-toggle="onlineOpen">Rekap Beli Online (${online.length} item) <span>${recapUi.onlineOpen ? '▴' : '▾'}</span></button>
-      <div class="recap-content ${recapUi.onlineOpen ? 'open' : ''}">${onlineContent}</div>
-    </div>
-    <div class="recap-block">
-      <button class="recap-toggle" data-toggle="offlineOpen">Rekap Beli Offline (${offline.length} item) <span>${recapUi.offlineOpen ? '▴' : '▾'}</span></button>
-      <div class="recap-content ${recapUi.offlineOpen ? 'open' : ''}">${offlineContent}</div>
-    </div>
-  `;
+  recapList.innerHTML = entries.map(([place, stateKey, title]) => `<div class="recap-block"><button class="recap-toggle" data-toggle="${stateKey}">${title} (${groups[place].length} item) <span>${recapUi[stateKey] ? '▴' : '▾'}</span></button><div class="recap-content ${recapUi[stateKey] ? 'open' : ''}">${renderGroup(groups[place])}</div></div>`).join('');
 }
 
-function sendWhatsApp() { const checked = getNeedBuyItems(); if (!checked.length) return alert('Belum ada item yang perlu dibeli.'); const text = ['Halo, rekap belanja Slaku:', '', ...checked.map((i, n) => `${n + 1}. ${i.category} - ${i.name} (stok:${i.currentStock}, minimal:${i.minStock}, beli:${i.buyQty})`)].join('\n'); window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`, '_blank'); }
+function sendWhatsApp() {
+  const need = getNeedBuyItems();
+  if (!need.length) {
+    const msg = 'Semua stok Slaku aman. Tidak ada bahan yang perlu dibeli.';
+    window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+    return;
+  }
+  const groups = {
+    Online: need.filter(i => i.place === 'Online'),
+    Lotte: need.filter(i => i.place === 'Lotte'),
+    Tokbin: need.filter(i => i.place === 'Tokbin'),
+    RizaPutra: need.filter(i => i.place === 'RizaPutra')
+  };
+  const lines = ['CHECKLIST BELANJA SLAKU', ''];
+  [['Online', 'REKAP BELI ONLINE'], ['Lotte', 'REKAP BELI LOTTE'], ['Tokbin', 'REKAP BELI TOKBIN'], ['RizaPutra', 'REKAP BELI RIZAPUTRA']].forEach(([key, title]) => {
+    if (!groups[key].length) return;
+    lines.push(title);
+    groups[key].forEach(i => lines.push(`- ${i.name} | ${i.buyQty} | pcs | ${getStockStatus(i).label}`));
+    lines.push('');
+  });
+  window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
+}
+
 function printRecap() { const checked = getNeedBuyItems(); const body = checked.length ? `<h2>Daftar Belanja Slaku</h2><ul>${checked.map(i => `<li>${esc(i.category)} - ${esc(i.name)} | Stok: ${i.currentStock} | Minimal: ${i.minStock} | Beli: ${i.buyQty}</li>`).join('')}</ul>` : '<p>Belum ada item yang perlu dibeli.</p>'; const w = window.open('', '_blank'); w.document.write(`<html><body>${body}</body></html>`); w.document.close(); w.print(); }
 function toCsv(rows) { return rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n'); }
 
