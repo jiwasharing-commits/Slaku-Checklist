@@ -17,7 +17,10 @@ const baseItems = Object.entries(categories).flatMap(([category, names]) => name
 let items = load();
 const list = document.getElementById('list');
 const resetBtn = document.getElementById('resetBtn');
+const recapList = document.getElementById('recapList');
+const waBtn = document.getElementById('waBtn');
 resetBtn.addEventListener('click', () => { if (!confirm('Reset semua checklist?')) return; items = baseItems.map(x => ({...x, checked:false})); save(); render(); });
+waBtn.addEventListener('click', sendWhatsApp);
 
 function load(){
   try{const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)); if(!Array.isArray(saved)) return structuredClone(baseItems); const map=new Map(saved.map(x=>[x.id,!!x.checked])); return baseItems.map(x=>({...x,checked:map.get(x.id)||false}));}
@@ -33,7 +36,23 @@ function render(){
       ${arr.map(item => `<label class="item"><input type="checkbox" data-id="${esc(item.id)}" ${item.checked?'checked':''}/><span>${esc(item.name)}</span></label>`).join('')}
     </details>
   `).join('');
-  list.querySelectorAll('input[type="checkbox"]').forEach((box)=>box.addEventListener('change',(e)=>{const id=e.target.dataset.id; const found=items.find(x=>x.id===id); if(!found)return; found.checked=e.target.checked; save();}));
+  list.querySelectorAll('input[type="checkbox"]').forEach((box)=>box.addEventListener('change',(e)=>{const id=e.target.dataset.id; const found=items.find(x=>x.id===id); if(!found)return; found.checked=e.target.checked; save(); renderRecap();}));
+  renderRecap();
 }
+
+function renderRecap(){
+  const checked = items.filter(x=>x.checked);
+  if(!checked.length){ recapList.innerHTML='<em>Belum ada item yang dicentang.</em>'; return; }
+  recapList.innerHTML = '<ol>'+checked.map(i=>`<li>${esc(i.category)} - ${esc(i.name)}</li>`).join('')+'</ol>';
+}
+
+function sendWhatsApp(){
+  const checked = items.filter(x=>x.checked);
+  if(!checked.length){ alert('Belum ada item yang dicentang.'); return; }
+  const msg = ['Halo, berikut rekap belanja Slaku:','',...checked.map((i,idx)=>`${idx+1}. ${i.category} - ${i.name}`)].join('\n');
+  const url = `https://wa.me/6287865706644?text=${encodeURIComponent(msg)}`;
+  window.open(url,'_blank');
+}
+
 function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
 render();
