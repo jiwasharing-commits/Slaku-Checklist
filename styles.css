@@ -29,3 +29,6 @@ details{border:1px solid var(--beige);border-radius:12px;padding:8px 10px;backgr
 .login-card input{width:100%;padding:12px;border:1px solid #d9c7b4;border-radius:10px}.error{color:#b23540;min-height:18px;margin:0;font-size:.9rem}
 .hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.logout-btn{border:1px solid #cdb9a4;background:transparent;color:var(--coffee);border-radius:10px;padding:7px 12px;font-weight:700;font-size:.85rem;white-space:nowrap;cursor:pointer;transition:all .2s ease}.logout-btn:hover{background:#f3e7d9;border-color:#b79c84;transform:translateY(-1px);box-shadow:0 6px 12px rgba(65,45,28,.12)}.logout-btn:active{transform:scale(.98)}
 button{cursor:pointer;transition:all .2s ease}
+.collapsible-header{display:flex;align-items:center;gap:8px;cursor:pointer}.collapsible-header h2{margin:0;flex:1}.collapsible-header span{color:#6f5f53}
+.recap-toggle{width:100%;text-align:left;background:#f6eee4;border:1px solid #dfcfbd;color:var(--coffee);padding:10px;border-radius:10px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.recap-content{max-height:0;overflow:hidden;opacity:0;transition:max-height .25s ease, opacity .2s ease}.recap-content.open{max-height:900px;opacity:1;margin-top:8px}

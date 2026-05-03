@@ -5,6 +5,9 @@ const WA_NUMBER = '6287865706644';
 const APP_USERNAME = 'slaku';
 const APP_PASSWORD = 'Solo713188';
 const LOGIN_KEY = 'slaku_logged_in';
+const RECAP_UI_KEY = 'slaku_recap_ui_v1';
+const defaultRecapUi = { mainOpen: true, onlineOpen: false, offlineOpen: false };
+let recapUi = loadRecapUi();
 
 const categories = {
   'DAIRY (SUSU & TURUNAN)': ['Susu Cair','Susu SKM','Whipping Cream','Susu AP','Creamcheese U Tart','Cream Cheese Asin','Yogurt','Susu Evaporate','Fiber Creme'],
@@ -37,6 +40,10 @@ const recapList = document.getElementById('recapList');
 const summary = document.getElementById('summary');
 const searchInput = document.getElementById('searchInput');
 const importInput = document.getElementById('importInput');
+const recapCard = document.getElementById('recapCard');
+const recapHeader = document.getElementById('recapHeader');
+const recapHeaderIcon = document.getElementById('recapHeaderIcon');
+const recapHeaderMeta = document.getElementById('recapHeaderMeta');
 
 function showApp() { loginPage.style.display = 'none'; appPage.style.display = ''; render(); }
 function showLogin() { appPage.style.display = 'none'; loginPage.style.display = 'flex'; }
@@ -66,6 +73,11 @@ document.getElementById('backupBtn').onclick = backupJson;
 document.getElementById('importBtn').onclick = () => importInput.click();
 importInput.addEventListener('change', importJson);
 searchInput.addEventListener('input', render);
+recapHeader?.addEventListener('click', () => { recapUi.mainOpen = !recapUi.mainOpen; saveRecapUi(); renderRecap(); });
+recapCard?.addEventListener('click', (e) => { const btn = e.target.closest('[data-toggle]'); if (!btn) return; const key = btn.getAttribute('data-toggle'); recapUi[key] = !recapUi[key]; saveRecapUi(); renderRecap(); });
+
+function loadRecapUi() { try { return { ...defaultRecapUi, ...(JSON.parse(localStorage.getItem(RECAP_UI_KEY)) || {}) }; } catch { return { ...defaultRecapUi }; } }
+function saveRecapUi() { localStorage.setItem(RECAP_UI_KEY, JSON.stringify(recapUi)); }
 
 function needsBuy(item) { return Number(item.currentStock) < Number(item.minStock); }
 function normalize(item) { const currentStock = Number(item.currentStock) || 0; const minStock = Number(item.minStock) || 0; const defaultBuy = Math.max(minStock - currentStock, 0); return { ...item, currentStock, minStock, buyQty: Number(item.buyQty) || defaultBuy, checked: item.checked || currentStock < minStock, place: item.place || 'Online & Offline' }; }
@@ -107,8 +119,35 @@ function renderRecap() {
   const needBuy = getNeedBuyItems();
   const online = needBuy.filter(i => i.place === 'Online' || i.place === 'Online & Offline');
   const offline = needBuy.filter(i => i.place === 'Offline' || i.place === 'Online & Offline');
-  const renderGroup = (arr) => { if (!arr.length) return '<p>Tidak ada item.</p>'; const grouped = {}; arr.forEach(i => ((grouped[i.category] ||= []).push(i))); return Object.entries(grouped).map(([cat, list]) => `<details open><summary>${esc(cat)} (${list.length})</summary><ul>${list.map(i => `<li>${getStockStatus(i).icon} ${getStockStatus(i).label} - ${esc(i.name)} | Stok: ${i.currentStock} | Minimal: ${i.minStock} | Beli: ${i.buyQty}</li>`).join('')}</ul></details>`).join(''); };
-  recapList.innerHTML = `<div class="recap-block"><h3>Rekap Beli Online</h3>${renderGroup(online)}</div><div class="recap-block"><h3>Rekap Beli Offline</h3>${renderGroup(offline)}</div>`;
+
+  recapHeaderMeta.textContent = `(${needBuy.length} item)`;
+  recapHeaderIcon.textContent = recapUi.mainOpen ? '▴' : '▾';
+
+  if (!recapUi.mainOpen) {
+    recapList.innerHTML = '';
+    return;
+  }
+
+  const renderGroup = (arr) => {
+    if (!arr.length) return '<p>Tidak ada item.</p>';
+    const grouped = {};
+    arr.forEach(i => ((grouped[i.category] ||= []).push(i)));
+    return Object.entries(grouped).map(([cat, list]) => `<details open><summary>${esc(cat)} (${list.length})</summary><ul>${list.map(i => `<li>${getStockStatus(i).icon} ${getStockStatus(i).label} - ${esc(i.name)} | Stok: ${i.currentStock} | Minimal: ${i.minStock} | Beli: ${i.buyQty}</li>`).join('')}</ul></details>`).join('');
+  };
+
+  const onlineContent = renderGroup(online);
+  const offlineContent = renderGroup(offline);
+
+  recapList.innerHTML = `
+    <div class="recap-block">
+      <button class="recap-toggle" data-toggle="onlineOpen">Rekap Beli Online (${online.length} item) <span>${recapUi.onlineOpen ? '▴' : '▾'}</span></button>
+      <div class="recap-content ${recapUi.onlineOpen ? 'open' : ''}">${onlineContent}</div>
+    </div>
+    <div class="recap-block">
+      <button class="recap-toggle" data-toggle="offlineOpen">Rekap Beli Offline (${offline.length} item) <span>${recapUi.offlineOpen ? '▴' : '▾'}</span></button>
+      <div class="recap-content ${recapUi.offlineOpen ? 'open' : ''}">${offlineContent}</div>
+    </div>
+  `;
 }
 
 function sendWhatsApp() { const checked = getNeedBuyItems(); if (!checked.length) return alert('Belum ada item yang perlu dibeli.'); const text = ['Halo, rekap belanja Slaku:', '', ...checked.map((i, n) => `${n + 1}. ${i.category} - ${i.name} (stok:${i.currentStock}, minimal:${i.minStock}, beli:${i.buyQty})`)].join('\n'); window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`, '_blank'); }
