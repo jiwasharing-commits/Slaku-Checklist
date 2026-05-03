@@ -27,3 +27,4 @@ details{border:1px solid var(--beige);border-radius:12px;padding:8px 10px;backgr
 .login-card{width:min(420px,100%);background:#fffdf9;border:1px solid var(--beige);border-radius:16px;box-shadow:0 8px 18px rgba(65,45,28,.08);padding:18px;display:grid;gap:10px}
 .login-card h1{margin:0;color:var(--coffee)}.login-card h2{margin:0;font-size:1.1rem;color:var(--text)}
 .login-card input{width:100%;padding:12px;border:1px solid #d9c7b4;border-radius:10px}.error{color:#b23540;min-height:18px;margin:0;font-size:.9rem}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.logout-btn{border:1px solid #cdb9a4;background:transparent;color:var(--coffee);border-radius:10px;padding:7px 12px;font-weight:700;font-size:.85rem;white-space:nowrap}
