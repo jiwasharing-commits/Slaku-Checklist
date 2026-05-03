@@ -134,7 +134,7 @@ function render() {
 function renderRow(item) {
   const st = getStockStatus(item);
   const pct = getStockPercent(item);
-  return `<div class="item"><label class="item-head"><input type="checkbox" data-id="${esc(item.id)}" class="check" ${item.checked ? 'checked' : ''}/><span>${esc(item.name)}</span><span class="status-badge status-${st.key}">${st.icon} ${st.label}</span></label><div class="stock-meta"><small class="stock-percent">Stok: ${Math.round(pct)}% dari minimal</small><div class="stock-bar"><div class="stock-fill stock-${st.key}" style="width:${pct}%"></div></div></div><div class="mini"><label>Stok Saat Ini<input type="number" min="0" step="0.1" inputmode="decimal" class="current" data-id="${esc(item.id)}" value="${item.currentStock}"/></label><label>Stok Minimal<input type="number" min="0" step="0.1" inputmode="decimal" class="min" data-id="${esc(item.id)}" value="${item.minStock}"/></label><label>Jumlah Dibeli<input type="number" min="0" step="0.1" inputmode="decimal" class="buy" data-id="${esc(item.id)}" value="${item.buyQty}"/></label><label>Tempat Beli<select class="place" data-id="${esc(item.id)}"><option ${item.place === 'Online' ? 'selected' : ''}>Online</option><option ${item.place === 'Offline' ? 'selected' : ''}>Offline</option><option ${item.place === 'Online & Offline' ? 'selected' : ''}>Online & Offline</option></select></label></div><div class="preset-wrap"><small>Preset stok</small><div class="preset-row">${[0,25,50,75,100].map(p=>`<button type="button" class="preset-btn" data-id="${esc(item.id)}" data-preset="${p}" ${p!==0 && Number(item.minStock)<=0 ? 'disabled' : ''}>${p}%</button>`).join('')}</div></div></div>`;
+  return `<div class="item"><label class="item-head"><input type="checkbox" data-id="${esc(item.id)}" class="check" ${item.checked ? 'checked' : ''}/><span>${esc(item.name)}</span><span class="status-badge status-${st.key}">${st.icon} ${st.label}</span></label><div class="stock-meta"><small class="stock-percent">Stok: ${Math.round(pct)}% dari minimal</small><div class="stock-bar"><div class="stock-fill stock-${st.key}" style="width:${pct}%"></div></div></div><div class="mini"><label>Stok Saat Ini<input type="number" min="0" step="1" inputmode="numeric" class="current" data-id="${esc(item.id)}" value="${item.currentStock}"/></label><label>Stok Minimal<input type="number" min="0" step="1" inputmode="numeric" class="min" data-id="${esc(item.id)}" value="${item.minStock}"/></label><label>Jumlah Dibeli<input type="number" min="0" step="1" inputmode="numeric" class="buy" data-id="${esc(item.id)}" value="${item.buyQty}"/></label><label>Tempat Beli<select class="place" data-id="${esc(item.id)}"><option ${item.place === 'Online' ? 'selected' : ''}>Online</option><option ${item.place === 'Offline' ? 'selected' : ''}>Offline</option><option ${item.place === 'Online & Offline' ? 'selected' : ''}>Online & Offline</option></select></label></div><div class="preset-wrap"><small>Preset stok</small><div class="preset-row">${[0,25,50,75,100].map(p=>`<button type="button" class="preset-btn" data-id="${esc(item.id)}" data-preset="${p}" ${p!==0 && Number(item.minStock)<=0 ? 'disabled' : ''}>${p}%</button>`).join('')}</div></div></div>`;
 }
 
 function bindRowEvents() {
@@ -146,7 +146,7 @@ function bindRowEvents() {
   list.querySelectorAll('.preset-btn').forEach(el => el.addEventListener('click', e => applyStockPreset(e.target.dataset.id, Number(e.target.dataset.preset))));
 }
 
-function round2(n) { return Math.round(n * 100) / 100; }
+function roundStock(n) { return Math.round(n); }
 
 function applyStockPreset(id, percent) {
   items = items.map(i => {
@@ -154,8 +154,8 @@ function applyStockPreset(id, percent) {
     const min = Number(i.minStock) || 0;
     let current = 0;
     if (percent === 0) current = 0;
-    else if (min > 0) current = round2((min * percent) / 100);
-    const buyQty = Math.max(round2(min - current), 0);
+    else if (min > 0) current = roundStock((min * percent) / 100);
+    const buyQty = Math.max(roundStock(min - current), 0);
     const next = { ...i, currentStock: current, buyQty };
     next.checked = next.checked || needsBuy(next);
     if (!needsBuy(next) && next.buyQty === 0) next.checked = false;
@@ -171,8 +171,8 @@ function updateStockLive(id, key, rawValue) {
   items = items.map(i => {
     if (i.id !== id) return i;
     const val = rawValue === '' ? 0 : Number(rawValue);
-    const next = { ...i, [key]: round2(Number.isNaN(val) ? 0 : val) };
-    next.buyQty = Math.max(round2(next.minStock - next.currentStock), 0);
+    const next = { ...i, [key]: roundStock(Number.isNaN(val) ? 0 : val) };
+    next.buyQty = Math.max(roundStock(next.minStock - next.currentStock), 0);
     next.checked = next.checked || needsBuy(next);
     if (!needsBuy(next) && next.buyQty === 0) next.checked = false;
     return normalize(next);
