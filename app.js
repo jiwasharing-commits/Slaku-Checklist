@@ -103,14 +103,52 @@ function renderRow(item) {
 
 function bindRowEvents() {
   list.querySelectorAll('.check').forEach(el => el.addEventListener('change', e => updateItem(e.target.dataset.id, { checked: e.target.checked })));
-  list.querySelectorAll('.current').forEach(el => el.addEventListener('input', e => updateStock(e.target.dataset.id, 'currentStock', e.target.value)));
-  list.querySelectorAll('.min').forEach(el => el.addEventListener('input', e => updateStock(e.target.dataset.id, 'minStock', e.target.value)));
-  list.querySelectorAll('.buy').forEach(el => el.addEventListener('input', e => updateItem(e.target.dataset.id, { buyQty: Number(e.target.value) || 0 })));
+  list.querySelectorAll('.current').forEach(el => el.addEventListener('input', e => updateStockLive(e.target.dataset.id, 'currentStock', e.target.value)));
+  list.querySelectorAll('.min').forEach(el => el.addEventListener('input', e => updateStockLive(e.target.dataset.id, 'minStock', e.target.value)));
+  list.querySelectorAll('.buy').forEach(el => el.addEventListener('input', e => updateBuyQtyLive(e.target.dataset.id, e.target.value)));
   list.querySelectorAll('.place').forEach(el => el.addEventListener('change', e => updateItem(e.target.dataset.id, { place: e.target.value })));
 }
 
 function updateItem(id, patch) { items = items.map(i => i.id === id ? normalize({ ...i, ...patch }) : i); save(); render(); }
-function updateStock(id, key, value) { items = items.map(i => { if (i.id !== id) return i; const next = { ...i, [key]: Number(value) || 0 }; next.buyQty = Math.max(next.minStock - next.currentStock, 0); next.checked = next.checked || needsBuy(next); if (!needsBuy(next) && next.buyQty === 0) next.checked = false; return normalize(next); }); save(); render(); }
+
+function updateStockLive(id, key, rawValue) {
+  items = items.map(i => {
+    if (i.id !== id) return i;
+    const val = rawValue === '' ? 0 : Number(rawValue);
+    const next = { ...i, [key]: Number.isNaN(val) ? 0 : val };
+    next.buyQty = Math.max(next.minStock - next.currentStock, 0);
+    next.checked = next.checked || needsBuy(next);
+    if (!needsBuy(next) && next.buyQty === 0) next.checked = false;
+    return normalize(next);
+  });
+  save();
+  updateRowStatus(id);
+  refreshDerivedDisplays();
+}
+
+function updateBuyQtyLive(id, rawValue) {
+  const val = rawValue === '' ? 0 : Number(rawValue);
+  items = items.map(i => i.id === id ? normalize({ ...i, buyQty: Number.isNaN(val) ? 0 : val }) : i);
+  save();
+  refreshDerivedDisplays();
+}
+
+function updateRowStatus(id) {
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+  const row = list.querySelector(`input[data-id="${CSS.escape(id)}"]`)?.closest('.item');
+  if (!row) return;
+  const badge = row.querySelector('.status-badge');
+  if (!badge) return;
+  const st = getStockStatus(item);
+  badge.className = `status-badge status-${st.key}`;
+  badge.textContent = `${st.icon} ${st.label}`;
+}
+
+function refreshDerivedDisplays() {
+  renderSummary();
+  renderRecap();
+}
 
 function renderSummary() { const perlu = items.filter(i => i.checked).length; summary.innerHTML = [['Total Item', items.length], ['Perlu Dibeli', perlu], ['Belum Perlu Dibeli', items.length - perlu]].map(([t, v]) => `<article class="card sum-card"><p>${t}</p><strong>${v}</strong></article>`).join(''); }
 function getNeedBuyItems() { return items.filter(i => ['kosong', 'kurang'].includes(getStockStatus(i).key)); }
