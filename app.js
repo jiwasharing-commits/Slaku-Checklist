@@ -13,7 +13,8 @@ const categories = {
   'PACKAGING – BOX & CONTAINER': ['Box Ivory 20 x 20 x 5','Box Ivory 18 x 18 x 5','Box Ivory 12 x 12 x 5','Box Ivory 10 x 10 x 5','Box Plastik Cup 10 cm','Korean Box Slice'],
   'PACKAGING – PAPER & BASE': ['Tatakan Kue 20 cm','Tatakan Kue 18 cm','Tatakan Kue Kertas 12 cm','Tatakan Kue 10 cm','Kertas Minyak Bulat 20','Kertas Minyak Bulat 18'],
   'PACKAGING – SUPPORT & AKSESORIS': ['Sendok Kayu','Plastik Transparan','Kabel Ties','Pita'],
-  'PACKAGING – STICKER': ['Sticker Slaku 4 cm','Sticker Tq 4 cm','Sticker Slaku 6 cm','Sticker Tq 6 cm','Solatip Sticker Bulat']
+  'PACKAGING – STICKER': ['Sticker Slaku 4 cm','Sticker Tq 4 cm','Sticker Slaku 6 cm','Sticker Tq 6 cm','Solatip Sticker Bulat'],
+  'PACKAGING': ['Sticker botol 200 ml Matcha','Sticker botol 200 ml Kopi Susu','Sticker botol 200 ml Coklat','Sticker botol 1 liter Matcha','Sticker botol 1 liter Kopi Susu','Sticker botol 1 liter Coklat','Botol 1 liter','Botol 200 ml']
 };
 
 const baseItems = Object.entries(categories).flatMap(([category, names]) =>
