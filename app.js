@@ -14,7 +14,8 @@ const categories = {
   'PACKAGING – PAPER & BASE': ['Tatakan Kue 20 cm','Tatakan Kue 18 cm','Tatakan Kue Kertas 12 cm','Tatakan Kue 10 cm','Kertas Minyak Bulat 20','Kertas Minyak Bulat 18'],
   'PACKAGING – SUPPORT & AKSESORIS': ['Sendok Kayu','Plastik Transparan','Kabel Ties','Pita'],
   'PACKAGING – STICKER': ['Sticker Slaku 4 cm','Sticker Tq 4 cm','Sticker Slaku 6 cm','Sticker Tq 6 cm','Solatip Sticker Bulat'],
-  'PACKAGING': ['Sticker botol 200 ml Matcha','Sticker botol 200 ml Kopi Susu','Sticker botol 200 ml Coklat','Sticker botol 1 liter Matcha','Sticker botol 1 liter Kopi Susu','Sticker botol 1 liter Coklat','Botol 1 liter','Botol 200 ml']
+  'PACKAGING': ['Sticker botol 200 ml Matcha','Sticker botol 200 ml Kopi Susu','Sticker botol 200 ml Coklat','Sticker botol 1 liter Matcha','Sticker botol 1 liter Kopi Susu','Sticker botol 1 liter Coklat','Botol 1 liter','Botol 200 ml'],
+  'PERALATAN / LAIN-LAIN': ['Torch Gun']
 };
 
 const baseItems = Object.entries(categories).flatMap(([category, names]) =>
@@ -80,9 +81,9 @@ function renderRow(item) {
   return `<div class="item">
     <label class="item-head"><input type="checkbox" data-id="${esc(item.id)}" class="check" ${item.checked ? 'checked' : ''}/><span>${esc(item.name)}</span><span class="status-badge status-${getStockStatus(item).key}">${getStockStatus(item).icon} ${getStockStatus(item).label}</span></label>
     <div class="mini">
-      <label>Stok Saat Ini<input type="number" class="current" data-id="${esc(item.id)}" value="${item.currentStock}"/></label>
-      <label>Stok Minimal<input type="number" class="min" data-id="${esc(item.id)}" value="${item.minStock}"/></label>
-      <label>Jumlah Dibeli<input type="number" class="buy" data-id="${esc(item.id)}" value="${item.buyQty}"/></label>
+      <label>Stok Saat Ini<input type="number" min="0" step="1" inputmode="numeric" class="current" data-id="${esc(item.id)}" value="${item.currentStock}"/></label>
+      <label>Stok Minimal<input type="number" min="0" step="1" inputmode="numeric" class="min" data-id="${esc(item.id)}" value="${item.minStock}"/></label>
+      <label>Jumlah Dibeli<input type="number" min="0" step="1" inputmode="numeric" class="buy" data-id="${esc(item.id)}" value="${item.buyQty}"/></label>
     </div>
   </div>`;
 }
