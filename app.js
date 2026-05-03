@@ -68,7 +68,8 @@ document.getElementById('toRecapBtn').onclick = () => document.getElementById('r
 document.getElementById('resetBtn').onclick = () => { if (confirm('Reset semua checklist?')) { items = items.map(x => ({ ...x, checked: false })); save(); render(); } };
 document.getElementById('waBtn').onclick = sendWhatsApp;
 document.getElementById('printBtn').onclick = printRecap;
-document.getElementById('csvBtn').onclick = exportCsv;
+document.getElementById('csvAllBtn').onclick = () => exportCsvAll();
+document.getElementById('csvNeedBtn').onclick = () => exportCsvNeedBuy();
 document.getElementById('backupBtn').onclick = backupJson;
 document.getElementById('importBtn').onclick = () => importInput.click();
 importInput.addEventListener('change', importJson);
@@ -190,7 +191,22 @@ function renderRecap() {
 
 function sendWhatsApp() { const checked = getNeedBuyItems(); if (!checked.length) return alert('Belum ada item yang perlu dibeli.'); const text = ['Halo, rekap belanja Slaku:', '', ...checked.map((i, n) => `${n + 1}. ${i.category} - ${i.name} (stok:${i.currentStock}, minimal:${i.minStock}, beli:${i.buyQty})`)].join('\n'); window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`, '_blank'); }
 function printRecap() { const checked = getNeedBuyItems(); const body = checked.length ? `<h2>Daftar Belanja Slaku</h2><ul>${checked.map(i => `<li>${esc(i.category)} - ${esc(i.name)} | Stok: ${i.currentStock} | Minimal: ${i.minStock} | Beli: ${i.buyQty}</li>`).join('')}</ul>` : '<p>Belum ada item yang perlu dibeli.</p>'; const w = window.open('', '_blank'); w.document.write(`<html><body>${body}</body></html>`); w.document.close(); w.print(); }
-function exportCsv() { const rows = [['Category', 'Item Name', 'Current Stock', 'Minimum Stock', 'Qty to Buy', 'Place'], ...getNeedBuyItems().map(i => [i.category, i.name, i.currentStock, i.minStock, i.buyQty, i.place])]; const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n'); downloadFile(csv, 'slaku-daftar-belanja.csv', 'text/csv'); }
+function toCsv(rows) { return rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n'); }
+
+function exportCsvAll() {
+  const rows = [['Kategori', 'Nama Bahan', 'Stok Saat Ini', 'Stok Minimal', 'Jumlah Dibeli', 'Satuan', 'Tempat Beli', 'Status'],
+    ...items.map(i => [i.category, i.name, i.currentStock, i.minStock, i.buyQty, 'pcs', i.place, getStockStatus(i).label])
+  ];
+  downloadFile(toCsv(rows), 'checklist-stok-slaku-semua-bahan.csv', 'text/csv');
+}
+
+function exportCsvNeedBuy() {
+  const need = getNeedBuyItems();
+  const rows = [['Kategori', 'Nama Bahan', 'Stok Saat Ini', 'Stok Minimal', 'Jumlah Dibeli', 'Satuan', 'Tempat Beli', 'Status'],
+    ...need.map(i => [i.category, i.name, i.currentStock, i.minStock, i.buyQty, 'pcs', i.place, getStockStatus(i).label])
+  ];
+  downloadFile(toCsv(rows), 'checklist-stok-slaku-perlu-dibeli.csv', 'text/csv');
+}
 function backupJson() { const payload = { appName: BACKUP_APP, backupVersion: BACKUP_VERSION, backupDate: new Date().toISOString(), categories, items }; downloadFile(JSON.stringify(payload, null, 2), `slaku-checklist-backup-${new Date().toISOString().slice(0, 10)}.json`, 'application/json'); }
 function importJson(e) { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { try { const parsed = JSON.parse(String(reader.result)); if (!parsed || parsed.appName !== BACKUP_APP || !Array.isArray(parsed.items)) throw new Error('invalid'); const map = new Map(parsed.items.map(x => [x.id, x])); items = baseItems.map(x => normalize({ ...x, ...(map.get(x.id) || {}) })); save(); render(); alert('Data berhasil diimport.'); } catch { alert('File backup tidak valid.'); } e.target.value = ''; }; reader.readAsText(file); }
 function downloadFile(content, filename, type) { const blob = new Blob([content], { type }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click(); URL.revokeObjectURL(a.href); }
