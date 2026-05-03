@@ -98,6 +98,12 @@ function saveRecapUi() { localStorage.setItem(RECAP_UI_KEY, JSON.stringify(recap
 function needsBuy(item) { return Number(item.currentStock) < Number(item.minStock); }
 function normalize(item) { const currentStock = Number(item.currentStock) || 0; const minStock = Number(item.minStock) || 0; const defaultBuy = Math.max(minStock - currentStock, 0); return { ...item, currentStock, minStock, buyQty: Number(item.buyQty) || defaultBuy, checked: item.checked || currentStock < minStock, place: item.place || 'Online & Offline' }; }
 function getStockStatus(item) { const current = Number(item.currentStock) || 0; const minimum = Number(item.minStock) || 0; if (current === 0) return { key: 'kosong', icon: '⛔', label: 'KOSONG' }; if (current > 0 && current < minimum) return { key: 'kurang', icon: '⚠️', label: 'KURANG' }; return { key: 'aman', icon: '✅', label: 'AMAN' }; }
+function getStockPercent(item) {
+  const current = Number(item.currentStock) || 0;
+  const minimum = Number(item.minStock) || 0;
+  if (minimum <= 0) return 0;
+  return Math.min(Math.max((current / minimum) * 100, 0), 100);
+}
 
 function load() {
   try {
@@ -127,7 +133,8 @@ function render() {
 
 function renderRow(item) {
   const st = getStockStatus(item);
-  return `<div class="item"><label class="item-head"><input type="checkbox" data-id="${esc(item.id)}" class="check" ${item.checked ? 'checked' : ''}/><span>${esc(item.name)}</span><span class="status-badge status-${st.key}">${st.icon} ${st.label}</span></label><div class="mini"><label>Stok Saat Ini<input type="number" min="0" step="1" inputmode="numeric" class="current" data-id="${esc(item.id)}" value="${item.currentStock}"/></label><label>Stok Minimal<input type="number" min="0" step="1" inputmode="numeric" class="min" data-id="${esc(item.id)}" value="${item.minStock}"/></label><label>Jumlah Dibeli<input type="number" min="0" step="1" inputmode="numeric" class="buy" data-id="${esc(item.id)}" value="${item.buyQty}"/></label><label>Tempat Beli<select class="place" data-id="${esc(item.id)}"><option ${item.place === 'Online' ? 'selected' : ''}>Online</option><option ${item.place === 'Offline' ? 'selected' : ''}>Offline</option><option ${item.place === 'Online & Offline' ? 'selected' : ''}>Online & Offline</option></select></label></div></div>`;
+  const pct = getStockPercent(item);
+  return `<div class="item"><label class="item-head"><input type="checkbox" data-id="${esc(item.id)}" class="check" ${item.checked ? 'checked' : ''}/><span>${esc(item.name)}</span><span class="status-badge status-${st.key}">${st.icon} ${st.label}</span></label><div class="stock-meta"><small class="stock-percent">Stok: ${Math.round(pct)}% dari minimal</small><div class="stock-bar"><div class="stock-fill stock-${st.key}" style="width:${pct}%"></div></div></div><div class="mini"><label>Stok Saat Ini<input type="number" min="0" step="0.1" inputmode="decimal" class="current" data-id="${esc(item.id)}" value="${item.currentStock}"/></label><label>Stok Minimal<input type="number" min="0" step="0.1" inputmode="decimal" class="min" data-id="${esc(item.id)}" value="${item.minStock}"/></label><label>Jumlah Dibeli<input type="number" min="0" step="0.1" inputmode="decimal" class="buy" data-id="${esc(item.id)}" value="${item.buyQty}"/></label><label>Tempat Beli<select class="place" data-id="${esc(item.id)}"><option ${item.place === 'Online' ? 'selected' : ''}>Online</option><option ${item.place === 'Offline' ? 'selected' : ''}>Offline</option><option ${item.place === 'Online & Offline' ? 'selected' : ''}>Online & Offline</option></select></label></div></div>`;
 }
 
 function bindRowEvents() {
@@ -172,6 +179,11 @@ function updateRowStatus(id) {
   const st = getStockStatus(item);
   badge.className = `status-badge status-${st.key}`;
   badge.textContent = `${st.icon} ${st.label}`;
+  const pct = Math.round(getStockPercent(item));
+  const txt = row.querySelector('.stock-percent');
+  if (txt) txt.textContent = `Stok: ${pct}% dari minimal`;
+  const fill = row.querySelector('.stock-fill');
+  if (fill) { fill.className = `stock-fill stock-${st.key}`; fill.style.width = `${pct}%`; }
 }
 
 function refreshDerivedDisplays() {

@@ -32,3 +32,4 @@ button{cursor:pointer;transition:all .2s ease}
 .collapsible-header{display:flex;align-items:center;gap:8px;cursor:pointer}.collapsible-header h2{margin:0;flex:1}.collapsible-header span{color:#6f5f53}
 .recap-toggle{width:100%;text-align:left;background:#f6eee4;border:1px solid #dfcfbd;color:var(--coffee);padding:10px;border-radius:10px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
 .recap-content{max-height:0;overflow:hidden;opacity:0;transition:max-height .25s ease, opacity .2s ease}.recap-content.open{max-height:900px;opacity:1;margin-top:8px}
+.stock-meta{margin:2px 0 8px}.stock-percent{display:block;color:#6f5f53;font-size:.76rem;margin-bottom:4px}.stock-bar{height:8px;background:#f2ebe1;border-radius:999px;overflow:hidden}.stock-fill{height:100%;transition:width .2s ease}.stock-fill.stock-kosong{background:#e9aab1}.stock-fill.stock-kurang{background:#e7c985}.stock-fill.stock-aman{background:#9dcc9f}
