@@ -10,6 +10,21 @@ const defaultRecapUi = { mainOpen: true, onlineOpen: false, offlineOpen: false }
 let recapUi = loadRecapUi();
 
 const categories = {
+  'DAIRY (SUSU & TURUNAN)': ['Susu INDOMILK UHT PLAIN 950 ML','Susu Kental Manis 370 gr Kaleng','RICH GOLD WHIPPED CREAM 907 gr','Diamond All Purpose Milk UHT','ROYAL VICTORIA CREAM CHEESE 2KG','Prochiz Spready 2kg','Yogurt Heavenly Blush Greek Classic','F&N Evaporated Filled Milk 380 gr','Fiber Crème Elenka 1 kg'],
+  'SWEETENER (GULA)': ['Gula Pasir Kuning 1 Kg','Gula Pasir Putih 1 Kg','Bola Deli Gula Halus 1 Kg','Light Brown Sugar Ricoman 500gram','Presso Gula Aren Cair 1 Liter'],
+  'FAT (LEMAK)': ['Butter Unsalted Anchor 1 Kg Repack','Butter Unsalted Holman 1 Kg Repack'],
+  'DRY INGREDIENT': ['Tepung Terigu Bogasari Cakra Kembar Emas Roti Oriental','Maizenaku 1 kg','Saf Instan Gold 500 gr','Marie Regal 1 Kg','Marie Susu 1 Kg','Biskoff lotus Crumble 750 gr/Biscoff 250 Gr'],
+  'FLAVORING & ADDITIVE': ['Xantan Gum','Izy Premix Powder Sea Salt 1 kg','Red Bell Vanili 30 ml','Garam dapur halus'], COFFEE: ['Kopi Dryed CF09S Maxfood','Presso Kopi Susu Blend'],
+  TEA: ['Matcha Homelab 200 gr','Thai Tea Chatramue 400 gr','Thai green Tea Chatramue 200 gr'], COKLAT: ['Coklat Bubu Bens Drop 22/24 Queen Anna','Dark Coklat Batang Tulip','Choco Chip'],
+  'PACKAGING – BOX & CONTAINER': ['Box Ivory 20 x 20 x 5 isi 12','Box Ivory 18 x 18 x 5 isi 12','Box Ivory 12 x 12 x 5 isi 12','Box Ivory 10 x 10 x 5 isi 12','Box Plastik Cup 10 cm isi 12','Korean Box Slice Isi 10'],
+  'PACKAGING – PAPER & BASE': ['Tatakan Kue 20 cm','Tatakan Kue 18 cm','Tatakan Kue Kertas 12 cm','Tatakan Kue 10 cm','Kertas Minyak Bulat 20','Kertas Minyak Bulat 18'],
+  'PACKAGING – SUPPORT & AKSESORIS': ['Sendok Kayu','Plastik Transparan','Kabel Ties','Pita'],
+  'PACKAGING – STICKER': ['Sticker Slaku 4 cm','Sticker Tq 4 cm','Sticker Slaku 6 cm','Sticker Tq 6 cm','Solatip Sticker Bulat'],
+  'PACKAGING': ['Sticker botol 200 ml Matcha','Sticker botol 200 ml Kopi Susu','Sticker botol 200 ml Coklat','Sticker botol 1 liter Matcha','Sticker botol 1 liter Kopi Susu','Sticker botol 1 liter Coklat','Botol 1 liter','Botol 200 ml'],
+  'PERALATAN / LAIN-LAIN': ['Torch Gun']
+};
+
+const legacyCategories = {
   'DAIRY (SUSU & TURUNAN)': ['Susu Cair','Susu SKM','Whipping Cream','Susu AP','Creamcheese U Tart','Cream Cheese Asin','Yogurt','Susu Evaporate','Fiber Creme'],
   'SWEETENER (GULA)': ['Gula Pasir','Gula Halus','Brown Sugar','Gula Aren Cair'],
   'FAT (LEMAK)': ['Butter Unsalted Primary','Butter Unsalt Secondary'],
@@ -24,7 +39,7 @@ const categories = {
   'PERALATAN / LAIN-LAIN': ['Torch Gun']
 };
 
-const baseItems = Object.entries(categories).flatMap(([category, names]) => names.map((name, i) => ({ id: `${category}-${i}-${name}`, category, name, checked: false, currentStock: 0, minStock: 0, buyQty: 0, place: 'Online & Offline' })));
+const baseItems = Object.entries(categories).flatMap(([category, names]) => names.map((name, i) => ({ id: `${category}__${i}`, category, name, checked: false, currentStock: 0, minStock: 0, buyQty: 0, place: 'Online & Offline' })));
 let items = load();
 
 const loginPage = document.getElementById('loginPage');
@@ -84,7 +99,20 @@ function needsBuy(item) { return Number(item.currentStock) < Number(item.minStoc
 function normalize(item) { const currentStock = Number(item.currentStock) || 0; const minStock = Number(item.minStock) || 0; const defaultBuy = Math.max(minStock - currentStock, 0); return { ...item, currentStock, minStock, buyQty: Number(item.buyQty) || defaultBuy, checked: item.checked || currentStock < minStock, place: item.place || 'Online & Offline' }; }
 function getStockStatus(item) { const current = Number(item.currentStock) || 0; const minimum = Number(item.minStock) || 0; if (current === 0) return { key: 'kosong', icon: '⛔', label: 'KOSONG' }; if (current > 0 && current < minimum) return { key: 'kurang', icon: '⚠️', label: 'KURANG' }; return { key: 'aman', icon: '✅', label: 'AMAN' }; }
 
-function load() { try { const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)); if (!Array.isArray(saved)) return structuredClone(baseItems); const map = new Map(saved.map(x => [x.id, x])); return baseItems.map(x => normalize({ ...x, ...(map.get(x.id) || {}) })); } catch { return structuredClone(baseItems); } }
+function load() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (!Array.isArray(saved)) return structuredClone(baseItems);
+    const map = new Map(saved.map(x => [x.id, x]));
+    return baseItems.map((x) => {
+      const index = Number(x.id.split('__')[1]);
+      const legacyName = legacyCategories[x.category]?.[index];
+      const legacyId = legacyName ? `${x.category}-${index}-${legacyName}` : '';
+      const byId = map.get(x.id) || (legacyId ? map.get(legacyId) : null);
+      return normalize({ ...x, ...(byId || {}) });
+    });
+  } catch { return structuredClone(baseItems); }
+}
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
 
 function render() {
