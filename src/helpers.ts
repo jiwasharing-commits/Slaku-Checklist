@@ -10,7 +10,7 @@ export const calculateStatus = (item: InventoryItem): InventoryStatus => {
   return 'Safe';
 };
 
-const esc = (value: string | number): string => `"${String(value).replaceAll('"', '""')}"`;
+const esc = (value: string | number): string => `"${String(value).replace(/"/g, '""')}"`;
 
 export const toCsv = (items: InventoryItem[], meta: OpnameMeta): string => {
   const header = ['Date','Staff','Checked','Item Name','Category','Unit','System Stock','Physical Stock','Variance','Notes','Status'];
