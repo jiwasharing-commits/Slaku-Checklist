@@ -67,8 +67,14 @@ function render() {
 }
 
 function renderRow(item) {
-  return `<div class="item"><label><input type="checkbox" data-id="${esc(item.id)}" class="check" ${item.checked ? 'checked' : ''}/><span>${esc(item.name)}</span></label>
-  <div class="mini"><label>Stok Saat Ini<input type="number" class="current" data-id="${esc(item.id)}" value="${item.currentStock}"/></label><label>Stok Minimal<input type="number" class="min" data-id="${esc(item.id)}" value="${item.minStock}"/></label><label>Jumlah Dibeli<input type="number" class="buy" data-id="${esc(item.id)}" value="${item.buyQty}"/></label></div></div>`;
+  return `<div class="item">
+    <label class="item-head"><input type="checkbox" data-id="${esc(item.id)}" class="check" ${item.checked ? 'checked' : ''}/><span>${esc(item.name)}</span></label>
+    <div class="mini">
+      <label>Stok Saat Ini<input type="number" class="current" data-id="${esc(item.id)}" value="${item.currentStock}"/></label>
+      <label>Stok Minimal<input type="number" class="min" data-id="${esc(item.id)}" value="${item.minStock}"/></label>
+      <label>Jumlah Dibeli<input type="number" class="buy" data-id="${esc(item.id)}" value="${item.buyQty}"/></label>
+    </div>
+  </div>`;
 }
 
 function bindRowEvents() {
