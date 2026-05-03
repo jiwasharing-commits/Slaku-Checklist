@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CHECK LIST OPNAME BARANG – SLAKU</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <section class="hero card">
+      <h1>CHECK LIST OPNAME BARANG – SLAKU</h1>
+      <p>Checklist bahan yang perlu dibeli untuk produksi Slaku.</p>
+    </section>
+
+    <section id="summaryCards" class="summary-grid"></section>
+
+    <section class="card section">
+      <input id="searchInput" type="text" placeholder="Cari nama item..." />
+    </section>
+
+    <section class="card section">
+      <h2>Checklist Belanja per Kategori</h2>
+      <div id="checklist"></div>
+    </section>
+
+    <section class="card section actions">
+      <button id="resetBtn" class="btn secondary">Reset Checklist</button>
+      <button id="printBtn" class="btn secondary">Print Daftar Belanja</button>
+      <button id="csvBtn" class="btn primary">Export CSV</button>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
