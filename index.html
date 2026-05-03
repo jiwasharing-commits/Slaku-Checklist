@@ -8,17 +8,37 @@
 </head>
 <body>
   <main class="wrap">
-    <h1>CHECK LIST OPNAME BARANG – SLAKU</h1>
-    <p>Checklist bahan yang perlu dibeli.</p>
-    <div id="list"></div>
-
-    <section class="recap">
-      <h2>Rekap Perlu Dibeli</h2>
-      <div id="recapList" class="recap-list"></div>
-      <button id="waBtn">Kirim Rekap ke WA 087865706644</button>
+    <section class="hero card">
+      <h1>CHECK LIST OPNAME BARANG – SLAKU</h1>
+      <p class="subtitle">Checklist bahan yang perlu dibeli untuk produksi Slaku.</p>
+      <p class="small">Centang bahan yang habis atau perlu dibeli.</p>
+      <div class="hero-actions">
+        <button id="startBtn" class="btn">Mulai Checklist</button>
+        <button id="toRecapBtn" class="btn btn-soft">Lihat Rekap</button>
+      </div>
     </section>
 
-    <button id="resetBtn">Reset Checklist</button>
+    <section id="summary" class="summary"></section>
+
+    <section class="card section">
+      <input id="searchInput" type="text" placeholder="Cari nama bahan..." />
+    </section>
+
+    <section class="card section">
+      <h2>Checklist Belanja</h2>
+      <div id="list"></div>
+    </section>
+
+    <section id="recapCard" class="card section">
+      <h2>Rekap Perlu Dibeli</h2>
+      <div id="recapList"></div>
+    </section>
+
+    <section class="actions">
+      <button id="waBtn" class="btn">Kirim Rekap ke WA</button>
+      <button id="printBtn" class="btn btn-soft">Print Daftar Belanja</button>
+      <button id="resetBtn" class="btn btn-danger">Reset Checklist</button>
+    </section>
   </main>
   <script src="app.js"></script>
 </body>
