@@ -10,3 +10,5 @@ details{border:1px solid var(--beige);border-radius:12px;padding:8px 10px;backgr
 .item{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px dashed #e7d7c6}.item:last-child{border-bottom:none}.item input{width:24px;height:24px;accent-color:var(--coffee)}
 .actions{position:sticky;bottom:8px;display:grid;gap:8px}
 @media(min-width:760px){.actions{grid-template-columns:repeat(3,minmax(0,1fr))}.btn{width:auto}}
+
+.mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:6px}.mini label{font-size:.75rem;color:#6f5f53}.mini input{width:100%;padding:7px;border:1px solid #d9c7b4;border-radius:8px}
