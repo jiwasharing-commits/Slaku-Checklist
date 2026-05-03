@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CHECK LIST OPNAME BARANG – SLAKU</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero card">
+      <h1>CHECK LIST OPNAME BARANG – SLAKU</h1>
+      <p class="subtitle">Checklist bahan yang perlu dibeli untuk produksi Slaku.</p>
+      <p class="small">Centang bahan yang habis atau perlu dibeli.</p>
+      <div class="hero-actions">
+        <button id="startBtn" class="btn">Mulai Checklist</button>
+        <button id="toRecapBtn" class="btn btn-soft">Lihat Rekap</button>
+      </div>
+    </section>
+
+    <section id="summary" class="summary"></section>
+
+    <section class="card section">
+      <input id="searchInput" type="text" placeholder="Cari nama bahan..." />
+    </section>
+
+    <section class="card section">
+      <h2>Checklist Belanja</h2>
+      <div id="list"></div>
+    </section>
+
+    <section id="recapCard" class="card section">
+      <h2>Rekap Perlu Dibeli</h2>
+      <div id="recapList"></div>
+    </section>
+
+    <section class="actions">
+      <button id="waBtn" class="btn">Kirim Rekap ke WA</button>
+      <button id="printBtn" class="btn btn-soft">Print Daftar Belanja</button>
+      <button id="resetBtn" class="btn btn-danger">Reset Checklist</button>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
