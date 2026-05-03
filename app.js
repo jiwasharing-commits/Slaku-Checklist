@@ -81,7 +81,7 @@ logoutBtn?.addEventListener('click', () => { localStorage.removeItem(LOGIN_KEY);
 document.getElementById('startBtn').onclick = () => window.scrollTo({ top: 260, behavior: 'smooth' });
 document.getElementById('toRecapBtn').onclick = () => document.getElementById('recapCard').scrollIntoView({ behavior: 'smooth' });
 document.getElementById('resetBtn').onclick = () => { if (confirm('Reset semua checklist?')) { items = items.map(x => ({ ...x, checked: false })); save(); render(); } };
-document.getElementById('waBtn').onclick = sendWhatsApp;
+document.getElementById('waBtn').onclick = () => sendWhatsAppAll();
 document.getElementById('printBtn').onclick = printRecap;
 document.getElementById('csvAllBtn').onclick = () => exportCsvAll();
 document.getElementById('csvNeedBtn').onclick = () => exportCsvNeedBuy();
@@ -91,6 +91,7 @@ importInput.addEventListener('change', importJson);
 searchInput.addEventListener('input', render);
 recapHeader?.addEventListener('click', () => { recapUi.mainOpen = !recapUi.mainOpen; saveRecapUi(); renderRecap(); });
 recapCard?.addEventListener('click', (e) => { const btn = e.target.closest('[data-toggle]'); if (!btn) return; const key = btn.getAttribute('data-toggle'); recapUi[key] = !recapUi[key]; saveRecapUi(); renderRecap(); });
+recapCard?.addEventListener('click', (e) => { const btn = e.target.closest('[data-wa-place]'); if (!btn || btn.disabled) return; sendWhatsAppByPlace(btn.getAttribute('data-wa-place')); });
 
 function loadRecapUi() { try { return { ...defaultRecapUi, ...(JSON.parse(localStorage.getItem(RECAP_UI_KEY)) || {}) }; } catch { return { ...defaultRecapUi }; } }
 function saveRecapUi() { localStorage.setItem(RECAP_UI_KEY, JSON.stringify(recapUi)); }
@@ -237,34 +238,40 @@ function renderRecap() {
   const entries = [
     ['Online', 'onlineOpen', 'Rekap Beli Online'],
     ['Lotte', 'lotteOpen', 'Rekap Beli Lotte'],
-    ['Tokbin', 'tokbinOpen', 'Rekap Beli Tokbin'],
+    ['Tokbin', 'tokbinOpen', 'Rekap Beli TokBin'],
     ['RizaPutra', 'rizaputraOpen', 'Rekap Beli RizaPutra']
   ];
 
-  recapList.innerHTML = entries.map(([place, stateKey, title]) => `<div class="recap-block"><button class="recap-toggle" data-toggle="${stateKey}">${title} (${groups[place].length} item) <span>${recapUi[stateKey] ? '▴' : '▾'}</span></button><div class="recap-content ${recapUi[stateKey] ? 'open' : ''}">${renderGroup(groups[place])}</div></div>`).join('');
+  recapList.innerHTML = entries.map(([place, stateKey, title]) => `<div class="recap-block"><button class="recap-toggle" data-toggle="${stateKey}">${title} (${groups[place].length} item) <span>${recapUi[stateKey] ? '▴' : '▾'}</span></button><div class="recap-content ${recapUi[stateKey] ? 'open' : ''}">${renderGroup(groups[place])}<button class="btn btn-soft wa-mini-btn" data-wa-place="${place}" ${groups[place].length ? '' : 'disabled'}>Kirim Rekap ke WA ${place === 'Online' ? 'Belanja Online' : (place === 'Tokbin' ? 'TokBin' : place)}</button>${groups[place].length ? '' : '<small class="wa-empty">Tidak ada bahan yang perlu dibeli.</small>'}</div></div>`).join('');
 }
 
-function sendWhatsApp() {
+function openWhatsAppMessage(message) { window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`, '_blank'); }
+
+function sendWhatsAppAll() {
   const need = getNeedBuyItems();
-  if (!need.length) {
-    const msg = 'Semua stok Slaku aman. Tidak ada bahan yang perlu dibeli.';
-    window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
-    return;
-  }
+  if (!need.length) return openWhatsAppMessage('Semua stok Slaku aman. Tidak ada bahan yang perlu dibeli.');
   const groups = {
     Online: need.filter(i => i.place === 'Online'),
-    Lotte: need.filter(i => i.place === 'Lotte'),
     Tokbin: need.filter(i => i.place === 'Tokbin'),
+    Lotte: need.filter(i => i.place === 'Lotte'),
     RizaPutra: need.filter(i => i.place === 'RizaPutra')
   };
   const lines = ['CHECKLIST BELANJA SLAKU', ''];
-  [['Online', 'REKAP BELI ONLINE'], ['Lotte', 'REKAP BELI LOTTE'], ['Tokbin', 'REKAP BELI TOKBIN'], ['RizaPutra', 'REKAP BELI RIZAPUTRA']].forEach(([key, title]) => {
+  [['Online', 'REKAP BELI ONLINE'], ['Tokbin', 'REKAP BELI TOKBIN'], ['Lotte', 'REKAP BELI LOTTE'], ['RizaPutra', 'REKAP BELI RIZAPUTRA']].forEach(([key, title]) => {
     if (!groups[key].length) return;
     lines.push(title);
     groups[key].forEach(i => lines.push(`- ${i.name} | ${i.buyQty} | pcs | ${getStockStatus(i).label}`));
     lines.push('');
   });
-  window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
+  openWhatsAppMessage(lines.join('\n'));
+}
+
+function sendWhatsAppByPlace(place) {
+  const list = getNeedBuyItems().filter(i => i.place === place);
+  if (!list.length) return;
+  const title = `CHECKLIST BELANJA SLAKU - ${place.toUpperCase()}`;
+  const lines = [title, ...list.map(i => `- ${i.name} | ${i.buyQty} | pcs | ${getStockStatus(i).label}`)];
+  openWhatsAppMessage(lines.join('\n'));
 }
 
 function printRecap() { const checked = getNeedBuyItems(); const body = checked.length ? `<h2>Daftar Belanja Slaku</h2><ul>${checked.map(i => `<li>${esc(i.category)} - ${esc(i.name)} | Stok: ${i.currentStock} | Minimal: ${i.minStock} | Beli: ${i.buyQty}</li>`).join('')}</ul>` : '<p>Belum ada item yang perlu dibeli.</p>'; const w = window.open('', '_blank'); w.document.write(`<html><body>${body}</body></html>`); w.document.close(); w.print(); }
