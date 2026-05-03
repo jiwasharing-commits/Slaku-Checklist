@@ -15,3 +15,7 @@ details{border:1px solid var(--beige);border-radius:12px;padding:8px 10px;backgr
 
 .mini{display:grid;grid-template-columns:1fr;gap:8px;margin-top:4px}.mini label{font-size:.78rem;color:#6f5f53;display:grid;gap:4px}.mini input{width:100%;padding:9px;border:1px solid #d9c7b4;border-radius:8px}
 @media(min-width:760px){.mini{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.status-badge{margin-left:auto;font-size:.72rem;font-weight:700;padding:4px 8px;border-radius:999px;white-space:nowrap}
+.status-kosong{background:#fde7e8;color:#9b2f39}
+.status-kurang{background:#fff2dc;color:#925c11}
+.status-aman{background:#e8f4e8;color:#2f6a3b}

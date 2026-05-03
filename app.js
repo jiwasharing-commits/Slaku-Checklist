@@ -66,9 +66,18 @@ function render() {
   renderRecap();
 }
 
+
+function getStockStatus(item) {
+  const current = Number(item.currentStock) || 0;
+  const minimum = Number(item.minStock) || 0;
+  if (current === 0) return { key: 'kosong', icon: '⛔', label: 'KOSONG' };
+  if (current > 0 && current < minimum) return { key: 'kurang', icon: '⚠️', label: 'KURANG' };
+  return { key: 'aman', icon: '✅', label: 'AMAN' };
+}
+
 function renderRow(item) {
   return `<div class="item">
-    <label class="item-head"><input type="checkbox" data-id="${esc(item.id)}" class="check" ${item.checked ? 'checked' : ''}/><span>${esc(item.name)}</span></label>
+    <label class="item-head"><input type="checkbox" data-id="${esc(item.id)}" class="check" ${item.checked ? 'checked' : ''}/><span>${esc(item.name)}</span><span class="status-badge status-${getStockStatus(item).key}">${getStockStatus(item).icon} ${getStockStatus(item).label}</span></label>
     <div class="mini">
       <label>Stok Saat Ini<input type="number" class="current" data-id="${esc(item.id)}" value="${item.currentStock}"/></label>
       <label>Stok Minimal<input type="number" class="min" data-id="${esc(item.id)}" value="${item.minStock}"/></label>
