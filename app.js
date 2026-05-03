@@ -1,5 +1,4 @@
-const STORAGE_KEY = 'slaku_simple_buy_checklist_v1';
-
+const STORAGE_KEY = 'slaku_simple_checklist_v2';
 const categories = {
   'DAIRY (SUSU & TURUNAN)': ['Susu Cair','Susu SKM','Whipping Cream','Susu AP','Creamcheese U Tart','Cream Cheese Asin','Yogurt','Susu Evaporate','Fiber Creme'],
   'SWEETENER (GULA)': ['Gula Pasir','Gula Halus','Brown Sugar','Gula Aren Cair'],
@@ -14,95 +13,27 @@ const categories = {
   'PACKAGING – SUPPORT & AKSESORIS': ['Sendok Kayu','Plastik Transparan','Kabel Ties','Pita'],
   'PACKAGING – STICKER': ['Sticker Slaku 4 cm','Sticker Tq 4 cm','Sticker Slaku 6 cm','Sticker Tq 6 cm','Solatip Sticker Bulat']
 };
+const baseItems = Object.entries(categories).flatMap(([category, names]) => names.map((name, i) => ({ id: `${category}-${i}-${name}`, category, name, checked: false })));
+let items = load();
+const list = document.getElementById('list');
+const resetBtn = document.getElementById('resetBtn');
+resetBtn.addEventListener('click', () => { if (!confirm('Reset semua checklist?')) return; items = baseItems.map(x => ({...x, checked:false})); save(); render(); });
 
-const defaultItems = Object.entries(categories).flatMap(([category, names]) => names.map((name, idx) => ({ id: `${category}-${idx}-${name}`, category, name, checked: false })));
-let items = loadItems();
+function load(){
+  try{const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)); if(!Array.isArray(saved)) return structuredClone(baseItems); const map=new Map(saved.map(x=>[x.id,!!x.checked])); return baseItems.map(x=>({...x,checked:map.get(x.id)||false}));}
+  catch{return structuredClone(baseItems);} }
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
 
-const summaryCards = document.getElementById('summaryCards');
-const searchInput = document.getElementById('searchInput');
-const checklist = document.getElementById('checklist');
-document.getElementById('resetBtn').addEventListener('click', resetChecklist);
-document.getElementById('printBtn').addEventListener('click', printChecklist);
-document.getElementById('csvBtn').addEventListener('click', exportCsv);
-searchInput.addEventListener('input', render);
-
-render();
-
-function loadItems() {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (!Array.isArray(parsed)) return structuredClone(defaultItems);
-    const map = new Map(parsed.map((x) => [x.id, !!x.checked]));
-    return defaultItems.map((item) => ({ ...item, checked: map.get(item.id) ?? false }));
-  } catch {
-    return structuredClone(defaultItems);
-  }
-}
-function saveItems() { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
-
-function render() {
-  const q = searchInput.value.trim().toLowerCase();
-  const filtered = items.filter((item) => item.name.toLowerCase().includes(q));
+function render(){
   const grouped = {};
-  filtered.forEach((item) => ((grouped[item.category] ||= []).push(item)));
-
-  const perlu = items.filter((i) => i.checked).length;
-  summaryCards.innerHTML = [
-    ['Total Item', items.length],
-    ['Perlu Dibeli', perlu],
-    ['Belum Perlu Dibeli', items.length - perlu],
-  ].map(([t, v]) => `<article class="card summary-card"><p>${t}</p><strong>${v}</strong></article>`).join('');
-
-  checklist.innerHTML = Object.entries(grouped).map(([category, list]) => `
+  items.forEach(item => ((grouped[item.category] ||= []).push(item)));
+  list.innerHTML = Object.entries(grouped).map(([category, arr]) => `
     <details open>
-      <summary>${escapeHtml(category)} (${list.length})</summary>
-      ${list.map((item) => `<label class="item"><input type="checkbox" data-id="${escapeHtml(item.id)}" ${item.checked ? 'checked' : ''}/><span>${escapeHtml(item.name)}</span></label>`).join('')}
+      <summary>${esc(category)}</summary>
+      ${arr.map(item => `<label class="item"><input type="checkbox" data-id="${esc(item.id)}" ${item.checked?'checked':''}/><span>${esc(item.name)}</span></label>`).join('')}
     </details>
-  `).join('') || '<p>Tidak ada item.</p>';
-
-  checklist.querySelectorAll('input[type="checkbox"]').forEach((box) => {
-    box.addEventListener('change', (e) => {
-      const id = e.target.getAttribute('data-id');
-      const found = items.find((i) => i.id === id);
-      if (!found) return;
-      found.checked = e.target.checked;
-      saveItems();
-      render();
-    });
-  });
+  `).join('');
+  list.querySelectorAll('input[type="checkbox"]').forEach((box)=>box.addEventListener('change',(e)=>{const id=e.target.dataset.id; const found=items.find(x=>x.id===id); if(!found)return; found.checked=e.target.checked; save();}));
 }
-
-function resetChecklist() {
-  if (!confirm('Reset semua checklist?')) return;
-  items = items.map((item) => ({ ...item, checked: false }));
-  saveItems();
-  render();
-}
-
-function getCheckedItems() { return items.filter((i) => i.checked); }
-
-function printChecklist() {
-  const checked = getCheckedItems();
-  const content = checked.length
-    ? `<h2>Daftar Belanja Slaku</h2><ul>${checked.map((i) => `<li>${escapeHtml(i.category)} - ${escapeHtml(i.name)}</li>`).join('')}</ul>`
-    : '<p>Tidak ada item yang perlu dibeli.</p>';
-  const w = window.open('', '_blank');
-  w.document.write(`<html><head><title>Print Daftar Belanja</title></head><body>${content}</body></html>`);
-  w.document.close();
-  w.print();
-}
-
-function exportCsv() {
-  const checked = getCheckedItems();
-  const rows = [['Category', 'Item Name'], ...checked.map((i) => [i.category, i.name])];
-  const csv = rows.map((row) => row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'slaku-daftar-belanja.csv';
-  a.click();
-}
-
-function escapeHtml(text) {
-  return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-}
+function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
+render();
