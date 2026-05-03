@@ -19,3 +19,5 @@ details{border:1px solid var(--beige);border-radius:12px;padding:8px 10px;backgr
 .status-kosong{background:#fde7e8;color:#9b2f39}
 .status-kurang{background:#fff2dc;color:#925c11}
 .status-aman{background:#e8f4e8;color:#2f6a3b}
+select{width:100%;padding:9px;border:1px solid #d9c7b4;border-radius:8px;background:#fff}
+.recap-block{margin-bottom:12px}.recap-block h3{margin:6px 0;color:var(--coffee);font-size:.95rem}

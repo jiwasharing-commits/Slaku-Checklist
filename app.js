@@ -19,7 +19,7 @@ const categories = {
 };
 
 const baseItems = Object.entries(categories).flatMap(([category, names]) =>
-  names.map((name, i) => ({ id: `${category}-${i}-${name}`, category, name, checked: false, currentStock: 0, minStock: 0, buyQty: 0 })),
+  names.map((name, i) => ({ id: `${category}-${i}-${name}`, category, name, checked: false, currentStock: 0, minStock: 0, buyQty: 0, place: 'Online & Offline' })),
 );
 
 let items = load();
@@ -45,7 +45,7 @@ function normalize(item) {
   const currentStock = Number(item.currentStock) || 0;
   const minStock = Number(item.minStock) || 0;
   const defaultBuy = Math.max(minStock - currentStock, 0);
-  return { ...item, currentStock, minStock, buyQty: Number(item.buyQty) || defaultBuy, checked: item.checked || currentStock < minStock };
+  return { ...item, currentStock, minStock, buyQty: Number(item.buyQty) || defaultBuy, checked: item.checked || currentStock < minStock, place: item.place || 'Online & Offline' };
 }
 
 function load() {
@@ -83,7 +83,7 @@ function renderRow(item) {
     <div class="mini">
       <label>Stok Saat Ini<input type="number" min="0" step="1" inputmode="numeric" class="current" data-id="${esc(item.id)}" value="${item.currentStock}"/></label>
       <label>Stok Minimal<input type="number" min="0" step="1" inputmode="numeric" class="min" data-id="${esc(item.id)}" value="${item.minStock}"/></label>
-      <label>Jumlah Dibeli<input type="number" min="0" step="1" inputmode="numeric" class="buy" data-id="${esc(item.id)}" value="${item.buyQty}"/></label>
+      <label>Jumlah Dibeli<input type="number" min="0" step="1" inputmode="numeric" class="buy" data-id="${esc(item.id)}" value="${item.buyQty}"/></label><label>Tempat Beli<select class="place" data-id="${esc(item.id)}"><option ${item.place==='Online'?'selected':''}>Online</option><option ${item.place==='Offline'?'selected':''}>Offline</option><option ${item.place==='Online & Offline'?'selected':''}>Online & Offline</option></select></label>
     </div>
   </div>`;
 }
@@ -93,6 +93,7 @@ function bindRowEvents() {
   list.querySelectorAll('.current').forEach(el => el.addEventListener('input', e => updateStock(e.target.dataset.id, 'currentStock', e.target.value)));
   list.querySelectorAll('.min').forEach(el => el.addEventListener('input', e => updateStock(e.target.dataset.id, 'minStock', e.target.value)));
   list.querySelectorAll('.buy').forEach(el => el.addEventListener('input', e => updateItem(e.target.dataset.id, { buyQty: Number(e.target.value) || 0 })));
+  list.querySelectorAll('.place').forEach(el => el.addEventListener('change', e => updateItem(e.target.dataset.id, { place: e.target.value })));
 }
 
 function updateItem(id, patch) {
@@ -118,30 +119,47 @@ function renderSummary() {
 }
 
 function getCheckedItems() { return items.filter(i => i.checked); }
+function getNeedBuyItems() { return items.filter(i => ['kosong','kurang'].includes(getStockStatus(i).key)); }
 
 function renderRecap() {
-  const checked = getCheckedItems();
-  if (!checked.length) { recapList.innerHTML = '<p>Belum ada item yang perlu dibeli.</p>'; return; }
-  const grouped = {};
-  checked.forEach(i => ((grouped[i.category] ||= []).push(i)));
-  recapList.innerHTML = Object.entries(grouped).map(([cat, list]) => `<details open><summary>${esc(cat)} (${list.length})</summary><ul>${list.map(i => `<li>${esc(i.name)} | Stok: ${i.currentStock} | Minimal: ${i.minStock} | Beli: ${i.buyQty}</li>`).join('')}</ul></details>`).join('');
+  const needBuy = items.filter(i => ['kosong','kurang'].includes(getStockStatus(i).key));
+  const online = needBuy.filter(i => i.place === 'Online' || i.place === 'Online & Offline');
+  const offline = needBuy.filter(i => i.place === 'Offline' || i.place === 'Online & Offline');
+
+  const renderGroup = (arr) => {
+    if (!arr.length) return '<p>Tidak ada item.</p>';
+    const grouped = {};
+    arr.forEach(i => ((grouped[i.category] ||= []).push(i)));
+    return Object.entries(grouped).map(([cat, list]) => `<details open><summary>${esc(cat)} (${list.length})</summary><ul>${list.map(i => `<li>${getStockStatus(i).icon} ${getStockStatus(i).label} - ${esc(i.name)} | Stok: ${i.currentStock} | Minimal: ${i.minStock} | Beli: ${i.buyQty}</li>`).join('')}</ul></details>`).join('');
+  };
+
+  recapList.innerHTML = `
+    <div class="recap-block">
+      <h3>Rekap Beli Online</h3>
+      ${renderGroup(online)}
+    </div>
+    <div class="recap-block">
+      <h3>Rekap Beli Offline</h3>
+      ${renderGroup(offline)}
+    </div>
+  `;
 }
 
 function sendWhatsApp() {
-  const checked = getCheckedItems(); if (!checked.length) return alert('Belum ada item yang perlu dibeli.');
+  const checked = getNeedBuyItems(); if (!checked.length) return alert('Belum ada item yang perlu dibeli.');
   const text = ['Halo, rekap belanja Slaku:','',...checked.map((i, n) => `${n + 1}. ${i.category} - ${i.name} (stok:${i.currentStock}, minimal:${i.minStock}, beli:${i.buyQty})`)].join('\n');
   window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`, '_blank');
 }
 
 function printRecap() {
-  const checked = getCheckedItems();
+  const checked = getNeedBuyItems();
   const body = checked.length ? `<h2>Daftar Belanja Slaku</h2><ul>${checked.map(i => `<li>${esc(i.category)} - ${esc(i.name)} | Stok: ${i.currentStock} | Minimal: ${i.minStock} | Beli: ${i.buyQty}</li>`).join('')}</ul>` : '<p>Belum ada item yang perlu dibeli.</p>';
   const w = window.open('', '_blank');
   w.document.write(`<html><body>${body}</body></html>`); w.document.close(); w.print();
 }
 
 function exportCsv() {
-  const rows = [['Category', 'Item Name', 'Current Stock', 'Minimum Stock', 'Qty to Buy'], ...getCheckedItems().map(i => [i.category, i.name, i.currentStock, i.minStock, i.buyQty])];
+  const rows = [['Category', 'Item Name', 'Current Stock', 'Minimum Stock', 'Qty to Buy', 'Place'], ...getNeedBuyItems().map(i => [i.category, i.name, i.currentStock, i.minStock, i.buyQty, i.place])];
   const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
   downloadFile(csv, 'slaku-daftar-belanja.csv', 'text/csv');
 }
