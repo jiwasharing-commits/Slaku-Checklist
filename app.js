@@ -214,7 +214,9 @@ function refreshDerivedDisplays() {
 
 function renderSummary() { const perlu = items.filter(i => i.checked).length; summary.innerHTML = [['Total Item', items.length], ['Perlu Dibeli', perlu], ['Belum Perlu Dibeli', items.length - perlu]].map(([t, v]) => `<article class="card sum-card"><p>${t}</p><strong>${v}</strong></article>`).join(''); }
 function getNeedBuyItems() { return items.filter(i => ['kosong', 'kurang'].includes(getStockStatus(i).key)); }
-function getRecapItemsByPlace(place) { return getNeedBuyItems().filter(i => i.place === place); }
+function isRecapEligible(item) { return item.checked && Number(item.buyQty) > 0 && ['kosong', 'kurang'].includes(getStockStatus(item).key); }
+function getRecapItemsByPlace(place) { return items.filter(i => i.place === place && isRecapEligible(i)); }
+function getAllRecapItems() { return items.filter(isRecapEligible); }
 
 function renderRecap() {
   const groups = {
@@ -253,7 +255,7 @@ function renderRecap() {
 function openWhatsAppMessage(message) { window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`, '_blank'); }
 
 function sendWhatsAppAll() {
-  const need = getNeedBuyItems();
+  const need = getAllRecapItems();
   if (!need.length) return openWhatsAppMessage('Semua stok Slaku aman. Tidak ada bahan yang perlu dibeli.');
   const groups = {
     Online: need.filter(i => i.place === 'Online'),
@@ -272,14 +274,14 @@ function sendWhatsAppAll() {
 }
 
 function sendWhatsAppByPlace(place) {
-  const list = getNeedBuyItems().filter(i => i.place === place);
+  const list = getRecapItemsByPlace(place);
   if (!list.length) return;
   const title = `CHECKLIST BELANJA SLAKU - ${place.toUpperCase()}`;
   const lines = [title, ...list.map(i => `- ${i.name} | ${i.buyQty} | pcs | ${getStockStatus(i).label}`)];
   openWhatsAppMessage(lines.join('\n'));
 }
 
-function printRecap() { const checked = getNeedBuyItems(); const body = checked.length ? `<h2>Daftar Belanja Slaku</h2><ul>${checked.map(i => `<li>${esc(i.category)} - ${esc(i.name)} | Stok: ${i.currentStock} | Minimal: ${i.minStock} | Beli: ${i.buyQty}</li>`).join('')}</ul>` : '<p>Belum ada item yang perlu dibeli.</p>'; const w = window.open('', '_blank'); w.document.write(`<html><body>${body}</body></html>`); w.document.close(); w.print(); }
+function printRecap() { const checked = getAllRecapItems(); const body = checked.length ? `<h2>Daftar Belanja Slaku</h2><ul>${checked.map(i => `<li>${esc(i.category)} - ${esc(i.name)} | Stok: ${i.currentStock} | Minimal: ${i.minStock} | Beli: ${i.buyQty}</li>`).join('')}</ul>` : '<p>Belum ada item yang perlu dibeli.</p>'; const w = window.open('', '_blank'); w.document.write(`<html><body>${body}</body></html>`); w.document.close(); w.print(); }
 function toCsv(rows) { return rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n'); }
 
 function exportCsvAll() {
@@ -290,7 +292,7 @@ function exportCsvAll() {
 }
 
 function exportCsvNeedBuy() {
-  const need = getNeedBuyItems();
+  const need = getAllRecapItems();
   const rows = [['Kategori', 'Nama Bahan', 'Stok Saat Ini', 'Stok Minimal', 'Jumlah Dibeli', 'Satuan', 'Tempat Beli', 'Status'],
     ...need.map(i => [i.category, i.name, i.currentStock, i.minStock, i.buyQty, 'pcs', i.place, getStockStatus(i).label])
   ];
