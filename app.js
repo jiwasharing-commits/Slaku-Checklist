@@ -91,7 +91,7 @@ importInput.addEventListener('change', importJson);
 searchInput.addEventListener('input', render);
 recapHeader?.addEventListener('click', () => { recapUi.mainOpen = !recapUi.mainOpen; saveRecapUi(); renderRecap(); });
 recapCard?.addEventListener('click', (e) => { const btn = e.target.closest('[data-toggle]'); if (!btn) return; const key = btn.getAttribute('data-toggle'); recapUi[key] = !recapUi[key]; saveRecapUi(); renderRecap(); });
-recapCard?.addEventListener('click', (e) => { const btn = e.target.closest('[data-wa-place]'); if (!btn || btn.disabled) return; sendWhatsAppByPlace(btn.getAttribute('data-wa-place')); });
+recapCard?.addEventListener('click', (e) => { const btn = e.target.closest('[data-wa-place]'); if (!btn) return; if (btn.disabled) { if (btn.getAttribute('data-wa-place') === 'Online') alert('Tidak ada bahan Online yang perlu dibeli.'); return; } sendWhatsAppByPlace(btn.getAttribute('data-wa-place')); });
 
 function loadRecapUi() { try { return { ...defaultRecapUi, ...(JSON.parse(localStorage.getItem(RECAP_UI_KEY)) || {}) }; } catch { return { ...defaultRecapUi }; } }
 function saveRecapUi() { localStorage.setItem(RECAP_UI_KEY, JSON.stringify(recapUi)); }
@@ -242,7 +242,7 @@ function renderRecap() {
     ['RizaPutra', 'rizaputraOpen', 'Rekap Beli RizaPutra']
   ];
 
-  recapList.innerHTML = entries.map(([place, stateKey, title]) => `<div class="recap-block"><button class="recap-toggle" data-toggle="${stateKey}">${title} (${groups[place].length} item) <span>${recapUi[stateKey] ? '▴' : '▾'}</span></button><div class="recap-content ${recapUi[stateKey] ? 'open' : ''}">${renderGroup(groups[place])}<button class="btn btn-soft wa-mini-btn" data-wa-place="${place}" ${groups[place].length ? '' : 'disabled'}>Kirim Rekap ke WA ${place === 'Online' ? 'Belanja Online' : (place === 'Tokbin' ? 'TokBin' : place)}</button>${groups[place].length ? '' : '<small class="wa-empty">Tidak ada bahan yang perlu dibeli.</small>'}</div></div>`).join('');
+  recapList.innerHTML = entries.map(([place, stateKey, title]) => `<div class="recap-block"><div class="recap-top"><button class="recap-toggle" data-toggle="${stateKey}">${title} (${groups[place].length} item) <span>${recapUi[stateKey] ? '▴' : '▾'}</span></button><button class="btn btn-soft wa-mini-btn" data-wa-place="${place}" ${groups[place].length ? '' : 'disabled'}>Kirim Rekap ke WA ${place === 'Online' ? 'Belanja Online' : (place === 'Tokbin' ? 'TokBin' : place)}</button></div><div class="recap-content ${recapUi[stateKey] ? 'open' : ''}">${renderGroup(groups[place])}${groups[place].length ? '' : '<small class="wa-empty">Tidak ada bahan yang perlu dibeli.</small>'}</div></div>`).join('');
 }
 
 function openWhatsAppMessage(message) { window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`, '_blank'); }
