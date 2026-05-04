@@ -37,3 +37,9 @@ button{cursor:pointer;transition:all .2s ease}
 @media(min-width:920px){.preset-wrap{width:calc((100% - 30px)/4)}}
 .wa-mini-btn{margin-top:8px;padding:8px 10px;font-size:.8rem}.wa-mini-btn:disabled{opacity:.5;cursor:not-allowed}.wa-empty{display:block;color:#7b6859;margin-top:4px}
 .recap-top{display:flex;gap:8px;align-items:center}.recap-top .recap-toggle{flex:1}.wa-mini-btn{width:auto;min-width:160px}
+/* Rekap layout cleanup */
+.collapsible-header{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:10px}.collapsible-header h2{margin:0}.collapsible-header #recapHeaderMeta{justify-self:end}
+.recap-top{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+.recap-toggle{min-height:40px;display:flex;align-items:center;justify-content:space-between}
+.wa-mini-btn{height:40px;min-width:220px;padding:0 12px;font-size:.8rem;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
+@media(max-width:640px){.recap-top{grid-template-columns:1fr}.wa-mini-btn{width:100%;min-width:0;height:38px}}
