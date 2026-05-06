@@ -101,3 +101,68 @@ button{cursor:pointer;transition:all .2s ease}
   }
   .item { padding: 7px 3px; }
 }
+
+/* Mobile override revision */
+@media (max-width: 640px) {
+  .item, .mini-wrap, .mini, .mini label, .mini input, .mini select { box-sizing: border-box; }
+  .item { width: 100%; max-width: 100%; overflow-x: hidden; }
+  .mini-wrap { overflow-x: hidden; width: 100%; max-width: 100%; }
+  .mini {
+    min-width: 0 !important;
+    width: 100%;
+    max-width: 100%;
+    grid-template-columns: 0.75fr 0.75fr 0.75fr 1.1fr;
+    gap: 4px;
+  }
+  .mini label { font-size: 10px; gap: 2px; }
+  .mini input, .mini select {
+    width: 100%;
+    max-width: 100%;
+    padding: 5px 4px;
+    font-size: 12px;
+    height: 30px;
+    min-width: 0;
+  }
+  .preset-row { gap: 4px; }
+  .preset-btn { font-size: 10px; padding: 2px 6px; }
+
+  .actions {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    z-index: 25;
+    width: min(90vw, 360px);
+    max-height: 34vh;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    padding: 8px;
+    border: 1px solid #e2d2bf;
+    border-radius: 12px;
+    background: rgba(255, 251, 245, 0.96);
+    box-shadow: 0 8px 18px rgba(65,45,28,.14);
+  }
+  .actions .btn {
+    width: 100%;
+    min-width: 0;
+    height: 36px;
+    min-height: 36px;
+    border-radius: 10px;
+    font-size: 11px;
+    padding: 0 6px;
+    line-height: 1.1;
+    box-shadow: none;
+  }
+  .actions #waBtn { font-weight: 800; }
+  .actions #csvAllBtn { font-size: 0; }
+  .actions #csvAllBtn::before { content: 'CSV Semua'; font-size: 11px; }
+  .actions #csvNeedBtn { font-size: 0; }
+  .actions #csvNeedBtn::before { content: 'CSV Beli'; font-size: 11px; }
+  .actions #backupBtn { font-size: 0; }
+  .actions #backupBtn::before { content: 'JSON'; font-size: 11px; }
+  .actions #importBtn { font-size: 0; }
+  .actions #importBtn::before { content: 'Import'; font-size: 11px; }
+  .actions #resetBtn { font-size: 0; }
+  .actions #resetBtn::before { content: 'Reset'; font-size: 11px; }
+}
