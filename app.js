@@ -9,37 +9,86 @@ const RECAP_UI_KEY = 'slaku_recap_ui_v1';
 const defaultRecapUi = { mainOpen: true, onlineOpen: false, lotteOpen: false, tokbinOpen: false, rizaputraOpen: false };
 let recapUi = loadRecapUi();
 
-const categories = {
-  'DAIRY (SUSU & TURUNAN)': ['Susu INDOMILK UHT PLAIN 950 ML','Susu Kental Manis 370 gr Kaleng','RICH GOLD WHIPPED CREAM 907 gr','Diamond All Purpose Milk UHT','ROYAL VICTORIA CREAM CHEESE 2KG','Prochiz Spready 2kg','Yogurt Heavenly Blush Greek Classic','F&N Evaporated Filled Milk 380 gr','Fiber Crème Elenka 1 kg'],
-  'SWEETENER (GULA)': ['Gula Pasir Kuning 1 Kg','Gula Pasir Putih 1 Kg','Bola Deli Gula Halus 1 Kg','Light Brown Sugar Ricoman 500gram','Presso Gula Aren Cair 1 Liter'],
-  'FAT (LEMAK)': ['Butter Unsalted Anchor 1 Kg Repack','Butter Unsalted Holman 1 Kg Repack'],
-  'DRY INGREDIENT': ['Tepung Terigu Bogasari Cakra Kembar Emas Roti Oriental','Maizenaku 1 kg','Saf Instan Gold 500 gr','Marie Regal 1 Kg','Marie Susu 1 Kg','Biskoff lotus Crumble 750 gr/Biscoff 250 Gr'],
-  'FLAVORING & ADDITIVE': ['Xantan Gum','Izy Premix Powder Sea Salt 1 kg','Red Bell Vanili 30 ml','Garam dapur halus'], COFFEE: ['Kopi Dryed CF09S Maxfood','Presso Kopi Susu Blend'],
-  TEA: ['Matcha Homelab 200 gr','Thai Tea Chatramue 400 gr','Thai green Tea Chatramue 200 gr'], COKLAT: ['Coklat Bubu Bens Drop 22/24 Queen Anna','Dark Coklat Batang Tulip','Choco Chip'],
-  'PACKAGING – BOX & CONTAINER': ['Box Ivory 20 x 20 x 5 isi 12','Box Ivory 18 x 18 x 5 isi 12','Box Ivory 12 x 12 x 5 isi 12','Box Ivory 10 x 10 x 5 isi 12','Box Plastik Cup 10 cm isi 12','Korean Box Slice Isi 10'],
-  'PACKAGING – PAPER & BASE': ['Tatakan Kue 20 cm','Tatakan Kue 18 cm','Tatakan Kue Kertas 12 cm','Tatakan Kue 10 cm','Kertas Minyak Bulat 20','Kertas Minyak Bulat 18'],
-  'PACKAGING – SUPPORT & AKSESORIS': ['Sendok Kayu','Plastik Transparan','Kabel Ties','Pita'],
-  'PACKAGING – STICKER': ['Sticker Slaku 4 cm','Sticker Tq 4 cm','Sticker Slaku 6 cm','Sticker Tq 6 cm','Solatip Sticker Bulat'],
-  'PACKAGING': ['Sticker botol 200 ml Matcha','Sticker botol 200 ml Kopi Susu','Sticker botol 200 ml Coklat','Sticker botol 1 liter Matcha','Sticker botol 1 liter Kopi Susu','Sticker botol 1 liter Coklat','Botol 1 liter','Botol 200 ml'],
-  'PERALATAN / LAIN-LAIN': ['Torch Gun']
+const CATEGORY_ORDER = ['Wajib & Rutin', 'Wajib & Waktu Lama', 'Resep Baru', 'Packaging', 'Packaging Pendukung', 'Cetak'];
+
+const ITEM_CATEGORY_MAP = {
+  'Susu INDOMILK UHT PLAIN 950 ML': 'Wajib & Rutin',
+  'Susu Kental Manis 370 gr Kaleng': 'Resep Baru',
+  'RICH GOLD WHIPPED CREAM 907 gr': 'Wajib & Rutin',
+  'Diamond All Purpose Milk UHT': 'Wajib & Rutin',
+  'ROYAL VICTORIA CREAM CHEESE 2KG': 'Wajib & Rutin',
+  'Prochiz Spready 2kg': 'Resep Baru',
+  'Yogurt Heavenly Blush Greek Classic': 'Wajib & Rutin',
+  'F&N Evaporated Filled Milk 380 gr': 'Wajib & Rutin',
+  'Fiber Crème Elenka 1 kg': 'Wajib & Rutin',
+  'Gula Pasir Kuning 1 Kg': 'Wajib & Rutin',
+  'Gula Pasir Putih 1 Kg': 'Wajib & Rutin',
+  'Bola Deli Gula Halus 1 Kg': 'Wajib & Rutin',
+  'Light Brown Sugar Ricoman 500gram': 'Resep Baru',
+  'Presso Gula Aren Cair 1 Liter': 'Resep Baru',
+  'Butter Unsalted Anchor 1 Kg Repack': 'Wajib & Rutin',
+  'Butter Unsalted Holman 1 Kg Repack': 'Wajib & Rutin',
+  'Tepung Terigu Bogasari Cakra Kembar Emas Roti Oriental': 'Resep Baru',
+  'Maizenaku 1 kg': 'Wajib & Rutin',
+  'Saf Instan Gold 500 gr': 'Resep Baru',
+  'Marie Regal 1 Kg': 'Wajib & Rutin',
+  'Marie Susu 1 Kg': 'Wajib & Rutin',
+  'Biskoff lotus Crumble 750 gr/Biscoff 250 Gr': 'Wajib & Rutin',
+  'Xantan Gum': 'Wajib & Waktu Lama',
+  'Izy Premix Powder Sea Salt 1 kg': 'Wajib & Waktu Lama',
+  'Red Bell Vanili 30 ml': 'Wajib & Rutin',
+  'Garam dapur halus': 'Wajib & Waktu Lama',
+  'Kopi Dryed CF09S Maxfood': 'Wajib & Rutin',
+  'Presso Kopi Susu Blend': 'Wajib & Rutin',
+  'Matcha Homelab 200 gr': 'Wajib & Rutin',
+  'Thai Tea Chatramue 400 gr': 'Resep Baru',
+  'Thai green Tea Chatramue 200 gr': 'Resep Baru',
+  'Coklat Bubu Bens Drop 22/24 Queen Anna': 'Wajib & Waktu Lama',
+  'Dark Coklat Batang Tulip': 'Resep Baru',
+  'Choco Chip': 'Resep Baru',
+  'Box Ivory 20 x 20 x 5 isi 12': 'Packaging',
+  'Box Ivory 18 x 18 x 5 isi 12': 'Packaging',
+  'Box Ivory 12 x 12 x 5 isi 12': 'Packaging Pendukung',
+  'Box Ivory 10 x 10 x 5 isi 12': 'Packaging Pendukung',
+  'Box Plastik Cup 10 cm isi 12': 'Packaging',
+  'Korean Box Slice Isi 10': 'Packaging',
+  'Tatakan Kue 20 cm': 'Packaging',
+  'Tatakan Kue 18 cm': 'Packaging',
+  'Tatakan Kue Kertas 12 cm': 'Packaging Pendukung',
+  'Tatakan Kue 10 cm': 'Packaging Pendukung',
+  'Kertas Minyak Bulat 20': 'Wajib & Rutin',
+  'Kertas Minyak Bulat 18': 'Wajib & Rutin',
+  'Sendok Kayu': 'Packaging',
+  'Plastik Transparan': 'Packaging',
+  'Kabel Ties': 'Packaging',
+  'Pita': 'Packaging',
+  'Sticker Slaku 4 cm': 'Cetak',
+  'Sticker Tq 4 cm': 'Cetak',
+  'Sticker Slaku 6 cm': 'Cetak',
+  'Sticker Tq 6 cm': 'Cetak',
+  'Solatip Sticker Bulat': 'Cetak',
+  'Sticker botol 200 ml Matcha': 'Cetak',
+  'Sticker botol 200 ml Kopi Susu': 'Cetak',
+  'Sticker botol 200 ml Coklat': 'Cetak',
+  'Sticker botol 1 liter Matcha': 'Cetak',
+  'Sticker botol 1 liter Kopi Susu': 'Cetak',
+  'Sticker botol 1 liter Coklat': 'Cetak',
+  'Botol 1 liter': 'Packaging',
+  'Botol 200 ml': 'Packaging',
+  'Torch Gun': 'Wajib & Rutin'
 };
 
-const legacyCategories = {
-  'DAIRY (SUSU & TURUNAN)': ['Susu Cair','Susu SKM','Whipping Cream','Susu AP','Creamcheese U Tart','Cream Cheese Asin','Yogurt','Susu Evaporate','Fiber Creme'],
-  'SWEETENER (GULA)': ['Gula Pasir','Gula Halus','Brown Sugar','Gula Aren Cair'],
-  'FAT (LEMAK)': ['Butter Unsalted Primary','Butter Unsalt Secondary'],
-  'DRY INGREDIENT': ['Tepung Terigu','Maizena','Ragi','Regal Primary','Regal Secondary','Biscoff'],
-  'FLAVORING & ADDITIVE': ['Xantan Gum','Seasalt Bubuk Minuman','Vanili','Garam'], COFFEE: ['Kopi Dryed CF09S Maxfood','Kopi Susu Blend'],
-  TEA: ['Matcha Homelab / Noomi','Daun Teh Kering Hijau','Daun Teh Kering Hitam'], COKLAT: ['Coklat Bubuk','Coklat Batang','Choco Chip'],
-  'PACKAGING – BOX & CONTAINER': ['Box Ivory 20 x 20 x 5','Box Ivory 18 x 18 x 5','Box Ivory 12 x 12 x 5','Box Ivory 10 x 10 x 5','Box Plastik Cup 10 cm','Korean Box Slice'],
-  'PACKAGING – PAPER & BASE': ['Tatakan Kue 20 cm','Tatakan Kue 18 cm','Tatakan Kue Kertas 12 cm','Tatakan Kue 10 cm','Kertas Minyak Bulat 20','Kertas Minyak Bulat 18'],
-  'PACKAGING – SUPPORT & AKSESORIS': ['Sendok Kayu','Plastik Transparan','Kabel Ties','Pita'],
-  'PACKAGING – STICKER': ['Sticker Slaku 4 cm','Sticker Tq 4 cm','Sticker Slaku 6 cm','Sticker Tq 6 cm','Solatip Sticker Bulat'],
-  'PACKAGING': ['Sticker botol 200 ml Matcha','Sticker botol 200 ml Kopi Susu','Sticker botol 200 ml Coklat','Sticker botol 1 liter Matcha','Sticker botol 1 liter Kopi Susu','Sticker botol 1 liter Coklat','Botol 1 liter','Botol 200 ml'],
-  'PERALATAN / LAIN-LAIN': ['Torch Gun']
-};
+const categories = CATEGORY_ORDER.reduce((acc, cat) => {
+  acc[cat] = Object.keys(ITEM_CATEGORY_MAP).filter((name) => ITEM_CATEGORY_MAP[name] === cat);
+  return acc;
+}, {});
 
-const baseItems = Object.entries(categories).flatMap(([category, names]) => names.map((name, i) => ({ id: `${category}__${i}`, category, name, checked: false, currentStock: 0, minStock: 0, buyQty: 0, place: 'Online & Offline' })));
+function slugifyName(name) {
+  return name.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+const baseItems = Object.entries(categories).flatMap(([category, names]) => names.map((name) => ({ id: `item-${slugifyName(name)}`, category, name, checked: false, currentStock: 0, minStock: 0, buyQty: 0, place: 'Online' })));
+
 let items = load();
 
 const loginPage = document.getElementById('loginPage');
@@ -111,12 +160,10 @@ function load() {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (!Array.isArray(saved)) return structuredClone(baseItems);
     const map = new Map(saved.map(x => [x.id, x]));
+    const byName = new Map(saved.map(x => [x.name, x]));
     return baseItems.map((x) => {
-      const index = Number(x.id.split('__')[1]);
-      const legacyName = legacyCategories[x.category]?.[index];
-      const legacyId = legacyName ? `${x.category}-${index}-${legacyName}` : '';
-      const byId = map.get(x.id) || (legacyId ? map.get(legacyId) : null);
-      return normalize({ ...x, ...(byId || {}) });
+      const found = map.get(x.id) || byName.get(x.name) || null;
+      return normalize({ ...x, ...(found || {}), category: ITEM_CATEGORY_MAP[x.name] || x.category, name: x.name });
     });
   } catch { return structuredClone(baseItems); }
 }
