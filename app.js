@@ -192,6 +192,76 @@ const DEFAULT_MIN_STOCK_MAP = {
   'Sticker botol 1 liter Coklat A3 12/lembar Vinyl+Glossy+cutting': 5
 };
 
+
+const DEFAULT_PLACE_MAP = {
+  'Susu INDOMILK UHT PLAIN 950 ML': 'Lotte',
+  'RICH GOLD WHIPPED CREAM 907 gr': 'Tokbin',
+  'Susu Diamond All Purpose Milk UHT 1 Liter': 'Tokbin',
+  'ROYAL VICTORIA CREAM CHEESE 2KG': 'Tokbin',
+  'Yogurt Heavenly Blush Greek Classic 200 ml': 'Online',
+  'F&N Evaporated Filled Milk 380 gr': 'Tokbin',
+  'Fiber creme Elenka 1 kg': 'Online',
+  'Gula Pasir Kuning 1 Kg': 'Tokbin',
+  'Gula Pasir Putih 1 Kg': 'Tokbin',
+  'Gula Halus Bola Deli 1 Kg': 'Online',
+  'Butter Unsalted Anchor 1 Kg Repack': 'Tokbin',
+  'Butter Unsalted Holman 1 Kg Repack': 'Tokbin',
+  'Tepung Maizena Maizenaku 1 kg': 'Online',
+  'Biskuit Marie Regal 1 Kg': 'Online',
+  'Biskuit Marie Susu 1 Kg': 'Online',
+  'Biskuit Biskoff lotus Crumble 750 gr': 'Tokbin',
+  'Perisa Vanili Red bell 30 ml': 'Tokbin',
+  'Kopi Dryed CF09S Maxfood 250 gr': 'Online',
+  'Kopi Espresso  Kopi Susu Blend Presso 1 Liter': 'Online',
+  'Bubuk Matcha Homelab 200 gr': 'Online',
+  'Kertas Minyak Bulat 20': 'Online',
+  'Kertas Minyak Bulat 18': 'Online',
+  'Gas Portable Hi-cook 230 gram': 'Online',
+  'Xantan Gum 100 gram': 'Online',
+  'Sea Salt Powder - izy Premix 1 kg': 'Online',
+  'Garam Halus Leaf Organic 100 gram': 'Online',
+  'Coklat Bubu Bens Drop 22/24 Queen Anna 1 kg': 'Online',
+  'Susu Kental Manis Kaleng Carnation 365 gr': 'Online',
+  'Keju Prochiz Spready 2kg': 'Online',
+  'Brown Sugar Light Ricoman 500gram': 'Online',
+  'Gula Aren Cair Presso 1 Liter': 'Online',
+  'Tepung Terigu Bogasari Cakra Kembar Emas Roti Oriental 1 Kg': 'Online',
+  'Ragi Saf Instan Gold 500 gr': 'Online',
+  'Teh Tubruk Thai Tea Chatramue 400 gr': 'Online',
+  'Teh Tubruk Thai green Tea Chatramue 200 gr': 'Online',
+  'Coklat Batang Dark Tulip 250 gr': 'Online',
+  'Choco Chip Callebaut Dark Chocolate Callets 811 54.5%': 'Online',
+  'Keju Edam Bola Ayam Emas 100 gram': 'Tokbin',
+  'Box Ivory 20 x 20 x 5 isi 12': 'Online',
+  'Box Ivory 18 x 18 x 5 isi 12': 'Online',
+  'Box Plastik Cup 10 cm isi 12': 'Online',
+  'Korean Box Slice Isi 10': 'Online',
+  'Tatakan Kue 20 cm': 'Online',
+  'Tatakan Kue 18 cm': 'Online',
+  'Sendok Kayu': 'Online',
+  'Plastik Transparan 25x48 200 gram': 'Online',
+  'Plastik Transparan 30x57 200 gram': 'Online',
+  'Kabel Ties 2.5 x 150 mm isi 100': 'Online',
+  'Pita': 'Online',
+  'Botol 1 liter': 'Online',
+  'Botol 200 ml': 'Online',
+  'Box Ivory 12 x 12 x 5 isi 12': 'Online',
+  'Box Ivory 10 x 10 x 5 isi 12': 'Online',
+  'Tatakan Kue Kertas 12 cm': 'Online',
+  'Tatakan Kue 10 cm': 'Online',
+  'Sticker box 18/10 Slaku 4 cm': 'RizaPutra',
+  'Sticker Thank for order 4 cm - Transparan': 'RizaPutra',
+  'Sticker box 20 Slaku 6 cm': 'RizaPutra',
+  'Sticker Thank for order 6 cm - Transparan': 'RizaPutra',
+  'Solatip Sticker Bulat': 'Online',
+  'Sticker botol 200 ml Matcha 5 x 8 cm A3 36/lembar Vinyl+Glossy+cutting': 'RizaPutra',
+  'Sticker botol 200 ml Kopi Susu 5 x 8 cm A3 36/lembar Vinyl+Glossy+cutting': 'RizaPutra',
+  'Sticker botol 200 ml Coklat 5 x 8 cm A3 36/lembar Vinyl+Glossy+cutting': 'RizaPutra',
+  'Sticker botol 1 liter Matcha A3 12/lembar Vinyl+Glossy+cutting': 'RizaPutra',
+  'Sticker botol 1 liter Kopi Susu A3 12/lembar Vinyl+Glossy+cutting': 'RizaPutra',
+  'Sticker botol 1 liter Coklat A3 12/lembar Vinyl+Glossy+cutting': 'RizaPutra'
+};
+
 const categories = CATEGORY_ORDER.reduce((acc, cat) => {
   acc[cat] = Object.keys(ITEM_CATEGORY_MAP).filter((name) => ITEM_CATEGORY_MAP[name] === cat);
   return acc;
@@ -201,7 +271,7 @@ function slugifyName(name) {
   return name.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
-const baseItems = Object.entries(categories).flatMap(([category, names]) => names.map((name) => ({ id: `item-${slugifyName(name)}`, category, name, checked: false, currentStock: 0, minStock: DEFAULT_MIN_STOCK_MAP[name] ?? 0, buyQty: 0, place: 'Online' })));
+const baseItems = Object.entries(categories).flatMap(([category, names]) => names.map((name) => ({ id: `item-${slugifyName(name)}`, category, name, checked: false, currentStock: 0, minStock: DEFAULT_MIN_STOCK_MAP[name] ?? 0, buyQty: 0, place: DEFAULT_PLACE_MAP[name] || 'Online' })));
 
 let items = load();
 
