@@ -288,6 +288,7 @@ const PRINT_FILE_MAP = {
   'Sticker Thank for order 4 cm Transparan-Kertas A3': 'https://drive.google.com/open?id=1XTjtyaVIzA4aU_91EG8FBKMBqk2eHUGf&usp=drive_fs',
   'Sticker Thank for order 5 cm - Transparan-Kertas A3': 'https://drive.google.com/open?id=1XTjtyaVIzA4aU_91EG8FBKMBqk2eHUGf&usp=drive_fs'
 };
+const ONLINE_LINK_MAP = {};
 
 const categories = CATEGORY_ORDER.reduce((acc, cat) => {
   acc[cat] = Object.keys(ITEM_CATEGORY_MAP)
@@ -569,6 +570,24 @@ function sendWhatsAppByPlace(place) {
     lines.push('Mohon konfirmasi estimasi selesai ya kak.');
     lines.push('Sekalian info nomor rekening untuk pembayarannya.');
     lines.push('Terima kasih 🙏');
+    return openWhatsAppMessage(lines.join('\n'));
+  }
+  if (place === 'Online') {
+    const missing = list.filter((i) => !ONLINE_LINK_MAP[i.name]).length;
+    const lines = ['CATATAN BELANJA ONLINE', ''];
+    list.forEach((i, idx) => {
+      lines.push(`${idx + 1}) ${i.name}`);
+      lines.push(`Jumlah: ${i.buyQty}`);
+      lines.push(`Link: ${ONLINE_LINK_MAP[i.name] || 'belum ada link'}`);
+      lines.push('');
+    });
+    if (missing > 0) lines.push(`Catatan: ${missing} item belum ada link.`);
+    return openWhatsAppMessage(lines.join('\n'));
+  }
+  if (place === 'Tokbin') {
+    const lines = ['Halo kak, kami mau order bahan berikut:', ''];
+    list.forEach((i, idx) => lines.push(`${idx + 1}) ${i.name} - ${i.buyQty} pcs`));
+    lines.push('', 'Mohon konfirmasi ketersediaan ya kak.', 'Terima kasih 🙏');
     return openWhatsAppMessage(lines.join('\n'));
   }
   const title = `CHECKLIST BELANJA SLAKU - ${place.toUpperCase()}`;
