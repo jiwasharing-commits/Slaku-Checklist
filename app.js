@@ -559,14 +559,16 @@ function sendWhatsAppByPlace(place) {
   if (place === 'RizaPutra') {
     const missing = list.filter((i) => !PRINT_FILE_MAP[i.name]);
     if (missing.length && !confirm(`Ada ${missing.length} item RizaPutra tanpa link file. Tetap kirim draft WA?`)) return;
-    const lines = ['Halo Kak RizaPutra, izin kirim draft cetak Slaku:', ''];
+    const lines = ['Halo Kak RizaPutra, kami mau order cetak item berikut:', ''];
     list.forEach((i, idx) => {
       lines.push(`${idx + 1}) ${i.name}`);
       lines.push(`Jumlah: ${i.buyQty} lembar`);
       lines.push(`Link: ${PRINT_FILE_MAP[i.name] || 'BELUM ADA'}`);
       lines.push('');
     });
-    lines.push('Mohon diproses yang linknya sudah ada dulu ya, terima kasih 🙏');
+    lines.push('Mohon konfirmasi estimasi selesai ya kak.');
+    lines.push('Sekalian info nomor rekening untuk pembayarannya.');
+    lines.push('Terima kasih 🙏');
     return openWhatsAppMessage(lines.join('\n'));
   }
   const title = `CHECKLIST BELANJA SLAKU - ${place.toUpperCase()}`;
