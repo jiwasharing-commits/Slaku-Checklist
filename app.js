@@ -122,6 +122,76 @@ const LEGACY_NAME_MAP = {
   'Sticker botol 1 liter Kopi Susu': 'Sticker botol 1 liter Kopi Susu A3 12/lembar Vinyl+Glossy+cutting',
   'Sticker botol 1 liter Coklat': 'Sticker botol 1 liter Coklat A3 12/lembar Vinyl+Glossy+cutting',
 };
+
+const DEFAULT_MIN_STOCK_MAP = {
+  'Susu INDOMILK UHT PLAIN 950 ML': 12,
+  'RICH GOLD WHIPPED CREAM 907 gr': 8,
+  'Susu Diamond All Purpose Milk UHT 1 Liter': 6,
+  'ROYAL VICTORIA CREAM CHEESE 2KG': 6,
+  'Yogurt Heavenly Blush Greek Classic 200 ml': 12,
+  'F&N Evaporated Filled Milk 380 gr': 6,
+  'Fiber creme Elenka 1 kg': 4,
+  'Gula Pasir Kuning 1 Kg': 2,
+  'Gula Pasir Putih 1 Kg': 4,
+  'Gula Halus Bola Deli 1 Kg': 2,
+  'Butter Unsalted Anchor 1 Kg Repack': 4,
+  'Butter Unsalted Holman 1 Kg Repack': 4,
+  'Tepung Maizena Maizenaku 1 kg': 2,
+  'Biskuit Marie Regal 1 Kg': 4,
+  'Biskuit Marie Susu 1 Kg': 4,
+  'Biskuit Biskoff lotus Crumble 750 gr': 4,
+  'Perisa Vanili Red bell 30 ml': 6,
+  'Kopi Dryed CF09S Maxfood 250 gr': 1,
+  'Kopi Espresso  Kopi Susu Blend Presso 1 Liter': 1,
+  'Bubuk Matcha Homelab 200 gr': 1,
+  'Kertas Minyak Bulat 20': 5,
+  'Kertas Minyak Bulat 18': 5,
+  'Gas Portable Hi-cook 230 gram': 4,
+  'Xantan Gum 100 gram': 1,
+  'Sea Salt Powder - izy Premix 1 kg': 1,
+  'Garam Halus Leaf Organic 100 gram': 1,
+  'Coklat Bubu Bens Drop 22/24 Queen Anna 1 kg': 1,
+  'Susu Kental Manis Kaleng Carnation 365 gr': 2,
+  'Keju Prochiz Spready 2kg': 1,
+  'Brown Sugar Light Ricoman 500gram': 1,
+  'Gula Aren Cair Presso 1 Liter': 1,
+  'Tepung Terigu Bogasari Cakra Kembar Emas Roti Oriental 1 Kg': 1,
+  'Ragi Saf Instan Gold 500 gr': 1,
+  'Teh Tubruk Thai Tea Chatramue 400 gr': 1,
+  'Teh Tubruk Thai green Tea Chatramue 200 gr': 1,
+  'Coklat Batang Dark Tulip 250 gr': 1,
+  'Choco Chip Callebaut Dark Chocolate Callets 811 54.5%': 1,
+  'Keju Edam Bola Ayam Emas 100 gram': 1,
+  'Box Ivory 20 x 20 x 5 isi 12': 5,
+  'Box Ivory 18 x 18 x 5 isi 12': 5,
+  'Box Plastik Cup 10 cm isi 12': 10,
+  'Korean Box Slice Isi 10': 10,
+  'Tatakan Kue 20 cm': 50,
+  'Tatakan Kue 18 cm': 50,
+  'Sendok Kayu': 2,
+  'Plastik Transparan 25x48 200 gram': 2,
+  'Plastik Transparan 30x57 200 gram': 2,
+  'Kabel Ties 2.5 x 150 mm isi 100': 4,
+  'Pita': 1,
+  'Botol 1 liter': 50,
+  'Botol 200 ml': 100,
+  'Box Ivory 12 x 12 x 5 isi 12': 5,
+  'Box Ivory 10 x 10 x 5 isi 12': 5,
+  'Tatakan Kue Kertas 12 cm': 5,
+  'Tatakan Kue 10 cm': 5,
+  'Sticker box 18/10 Slaku 4 cm': 2,
+  'Sticker Thank for order 4 cm - Transparan': 2,
+  'Sticker box 20 Slaku 6 cm': 2,
+  'Sticker Thank for order 6 cm - Transparan': 2,
+  'Solatip Sticker Bulat': 2,
+  'Sticker botol 200 ml Matcha 5 x 8 cm A3 36/lembar Vinyl+Glossy+cutting': 5,
+  'Sticker botol 200 ml Kopi Susu 5 x 8 cm A3 36/lembar Vinyl+Glossy+cutting': 5,
+  'Sticker botol 200 ml Coklat 5 x 8 cm A3 36/lembar Vinyl+Glossy+cutting': 5,
+  'Sticker botol 1 liter Matcha A3 12/lembar Vinyl+Glossy+cutting': 5,
+  'Sticker botol 1 liter Kopi Susu A3 12/lembar Vinyl+Glossy+cutting': 5,
+  'Sticker botol 1 liter Coklat A3 12/lembar Vinyl+Glossy+cutting': 5
+};
+
 const categories = CATEGORY_ORDER.reduce((acc, cat) => {
   acc[cat] = Object.keys(ITEM_CATEGORY_MAP).filter((name) => ITEM_CATEGORY_MAP[name] === cat);
   return acc;
@@ -131,7 +201,7 @@ function slugifyName(name) {
   return name.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
-const baseItems = Object.entries(categories).flatMap(([category, names]) => names.map((name) => ({ id: `item-${slugifyName(name)}`, category, name, checked: false, currentStock: 0, minStock: 0, buyQty: 0, place: 'Online' })));
+const baseItems = Object.entries(categories).flatMap(([category, names]) => names.map((name) => ({ id: `item-${slugifyName(name)}`, category, name, checked: false, currentStock: 0, minStock: DEFAULT_MIN_STOCK_MAP[name] ?? 0, buyQty: 0, place: 'Online' })));
 
 let items = load();
 
