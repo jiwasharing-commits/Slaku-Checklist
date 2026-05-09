@@ -269,7 +269,9 @@ const DEFAULT_PLACE_MAP = {
 };
 
 const categories = CATEGORY_ORDER.reduce((acc, cat) => {
-  acc[cat] = Object.keys(ITEM_CATEGORY_MAP).filter((name) => ITEM_CATEGORY_MAP[name] === cat);
+  acc[cat] = Object.keys(ITEM_CATEGORY_MAP)
+    .filter((name) => ITEM_CATEGORY_MAP[name] === cat)
+    .sort((a, b) => a.localeCompare(b, 'id'));
   return acc;
 }, {});
 
