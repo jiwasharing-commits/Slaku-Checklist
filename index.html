@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CHECK LIST OPNAME BARANG – SLAKU</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <section id="loginPage" class="login-wrap">
+    <div class="login-card">
+      <h1>Slaku</h1>
+      <h2>Login Checklist Stok Slaku</h2>
+      <input id="usernameInput" type="text" placeholder="Username" />
+      <input id="passwordInput" type="password" placeholder="Password" />
+      <button id="loginBtn" class="btn">Masuk</button>
+      <p id="loginError" class="error"></p>
+    </div>
+  </section>
+
+  <main id="appPage" class="wrap" style="display:none">
+    <section class="hero card">
+      <div class="hero-top"><h1>CHECK LIST OPNAME BARANG – SLAKU</h1><button id="logoutBtn" class="logout-btn">Logout</button></div>
+      <p class="subtitle">Checklist bahan yang perlu dibeli untuk produksi Slaku.</p>
+      <p class="small">Centang bahan yang habis atau perlu dibeli.</p>
+      <div class="hero-actions">
+        <button id="startBtn" class="btn">Mulai Checklist</button>
+        <button id="toRecapBtn" class="btn btn-soft">Lihat Rekap</button>
+      </div>
+    </section>
+
+    <section id="summary" class="summary"></section>
+    <section class="card section"><input id="searchInput" type="text" placeholder="Cari nama bahan..." /></section>
+    <section class="card section"><h2>Checklist Belanja</h2><div id="list"></div></section>
+    <section id="recapCard" class="card section"><div id="recapHeader" class="collapsible-header"><h2>Rekap Perlu Dibeli</h2><span id="recapHeaderMeta"></span><span id="recapHeaderIcon">▴</span></div><div id="recapList"></div></section>
+
+    <section class="actions">
+      <button id="waBtn" class="btn">Kirim Rekap Keseluruhan ke WA</button>
+      <button id="printBtn" class="btn btn-soft">Print Daftar Belanja</button>
+      <button id="csvAllBtn" class="btn btn-soft">Export CSV Semua Bahan</button>
+      <button id="csvNeedBtn" class="btn btn-soft">Export CSV Perlu Dibeli</button>
+      <button id="backupBtn" class="btn btn-soft">Backup JSON</button>
+      <button id="importBtn" class="btn btn-soft">Import JSON</button>
+      <input id="importInput" type="file" accept="application/json" hidden />
+      <button id="resetBtn" class="btn btn-danger">Reset Checklist</button>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
