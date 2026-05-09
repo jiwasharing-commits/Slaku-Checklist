@@ -26,6 +26,10 @@ details{border:1px solid var(--beige);border-radius:12px;padding:8px 10px;backgr
 .status-kosong{background:#fde7e8;color:#9b2f39}
 .status-kurang{background:#fff2dc;color:#925c11}
 .status-aman{background:#e8f4e8;color:#2f6a3b}
+.print-file-badge{margin:2px 0 8px;font-size:.74rem;font-weight:700}
+.print-file-badge.has-file{color:#2f6a3b}
+.print-file-badge.no-file{color:#9b2f39}
+.print-file-badge a{margin-left:6px}
 .recap-block{margin-bottom:12px}.recap-block h3{margin:6px 0;color:var(--coffee);font-size:.95rem}
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;background:var(--cream)}
 .login-card{width:min(420px,100%);background:#fffdf9;border:1px solid var(--beige);border-radius:16px;box-shadow:0 8px 18px rgba(65,45,28,.08);padding:18px;display:grid;gap:10px}

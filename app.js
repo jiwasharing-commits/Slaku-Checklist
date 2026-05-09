@@ -270,6 +270,19 @@ const DEFAULT_PLACE_MAP = {
   'Sticker botol 1 liter Coklat-16x8 cm-A3 12/lembar Vinyl+Glossy+cutting': 'RizaPutra'
 };
 
+const PRINT_FILE_MAP = {
+  'Sticker botol 1 liter Coklat-16x8 cm-A3 12/lembar Vinyl+Glossy+cutting': 'https://drive.google.com/open?id=1QtO5WC7xQrl6222q8qhcLw2GuqugZ_-j&usp=drive_fs',
+  'Sticker botol 1 liter Kopi Susu-16x8 cm-A3 12/lembar Vinyl+Glossy+cutting': 'https://drive.google.com/open?id=1KPVx8rutSbhJrTQSfxG1Qq2jyoqSFnkb&usp=drive_fs',
+  'Sticker botol 1 liter Matcha-16x8 cm-A3 12/lembar Vinyl+Glossy+cutting': 'https://drive.google.com/open?id=1y5G0bIGSEUc6hoq0EOtSwwBjHMO72zzX&usp=drive_fs',
+  'Sticker botol 200 ml Coklat 5 x 8 cm A3 36/lembar Vinyl+Glossy+cutting': 'https://drive.google.com/open?id=1VX63mc7KNmbEH4B-j2MLbrLA1SmwJE_x&usp=drive_fs',
+  'Sticker botol 200 ml Kopi Susu 5 x 8 cm A3 36/lembar Vinyl+Glossy+cutting': 'https://drive.google.com/open?id=1vEevg_ggCErBz0O_FPwLGe0Ta4fLtnvm&usp=drive_fs',
+  'Sticker botol 200 ml Matcha 5 x 8 cm A3 36/lembar Vinyl+Glossy+cutting': 'https://drive.google.com/open?id=1oOxdqQ3sl3TnGNz9PNbkbivQ-l7jDZv8&usp=drive_fs',
+  'Sticker box 18/10 Slaku 4 cm-Kertas A3': 'https://drive.google.com/open?id=1R8j1nGTULOPZBdRfG7DKnNJK5L94WDPA&usp=drive_fs',
+  'Sticker box 20 Slaku 5 cm-Kertas A3': 'https://drive.google.com/open?id=1R8j1nGTULOPZBdRfG7DKnNJK5L94WDPA&usp=drive_fs',
+  'Sticker Thank for order 4 cm Transparan-Kertas A3': 'https://drive.google.com/open?id=1XTjtyaVIzA4aU_91EG8FBKMBqk2eHUGf&usp=drive_fs',
+  'Sticker Thank for order 5 cm - Transparan-Kertas A3': 'https://drive.google.com/open?id=1XTjtyaVIzA4aU_91EG8FBKMBqk2eHUGf&usp=drive_fs'
+};
+
 const categories = CATEGORY_ORDER.reduce((acc, cat) => {
   acc[cat] = Object.keys(ITEM_CATEGORY_MAP)
     .filter((name) => ITEM_CATEGORY_MAP[name] === cat)
@@ -393,7 +406,11 @@ function render() {
 function renderRow(item) {
   const st = getStockStatus(item);
   const pct = getStockPercent(item);
-  return `<div class="item"><label class="item-head"><input type="checkbox" data-id="${esc(item.id)}" class="check" ${item.checked ? 'checked' : ''}/><span>${esc(item.name)}</span><span class="status-badge status-${st.key}">${st.icon} ${st.label}</span></label><div class="stock-meta"><small class="stock-percent">Stok: ${Math.round(pct)}% dari minimal</small><div class="stock-bar"><div class="stock-fill stock-${st.key}" style="width:${pct}%"></div></div></div><div class="mini-wrap"><div class="mini"><label>Saat Ini<input type="number" min="0" step="1" inputmode="numeric" class="current" data-id="${esc(item.id)}" value="${item.currentStock}"/></label><label>Minimal<input type="number" min="0" step="1" inputmode="numeric" class="min" data-id="${esc(item.id)}" value="${item.minStock}"/></label><label>Beli<input type="number" min="0" step="1" inputmode="numeric" class="buy" data-id="${esc(item.id)}" value="${item.buyQty}" readonly/></label><label>Tempat Beli<select class="place" data-id="${esc(item.id)}"><option ${item.place === 'Online' ? 'selected' : ''}>Online</option><option ${item.place === 'Lotte' ? 'selected' : ''}>Lotte</option><option ${item.place === 'Tokbin' ? 'selected' : ''}>Tokbin</option><option ${item.place === 'RizaPutra' ? 'selected' : ''}>RizaPutra</option></select></label></div></div><div class="preset-wrap"><small>Preset stok</small><div class="preset-row">${[0,25,50,75,100].map(p=>`<button type="button" class="preset-btn" data-id="${esc(item.id)}" data-preset="${p}" ${p!==0 && Number(item.minStock)<=0 ? 'disabled' : ''}>${p}%</button>`).join('')}</div></div></div>`;
+  const printLink = PRINT_FILE_MAP[item.name] || '';
+  const printBadge = item.place === 'RizaPutra'
+    ? `<div class="print-file-badge ${printLink ? 'has-file' : 'no-file'}">${printLink ? '🟢 Link file ada' : '🔴 Link file belum ada'}${printLink ? ` <a href="${esc(printLink)}" target="_blank" rel="noopener">Buka</a>` : ''}</div>`
+    : '';
+  return `<div class="item"><label class="item-head"><input type="checkbox" data-id="${esc(item.id)}" class="check" ${item.checked ? 'checked' : ''}/><span>${esc(item.name)}</span><span class="status-badge status-${st.key}">${st.icon} ${st.label}</span></label>${printBadge}<div class="stock-meta"><small class="stock-percent">Stok: ${Math.round(pct)}% dari minimal</small><div class="stock-bar"><div class="stock-fill stock-${st.key}" style="width:${pct}%"></div></div></div><div class="mini-wrap"><div class="mini"><label>Saat Ini<input type="number" min="0" step="1" inputmode="numeric" class="current" data-id="${esc(item.id)}" value="${item.currentStock}"/></label><label>Minimal<input type="number" min="0" step="1" inputmode="numeric" class="min" data-id="${esc(item.id)}" value="${item.minStock}"/></label><label>Beli<input type="number" min="0" step="1" inputmode="numeric" class="buy" data-id="${esc(item.id)}" value="${item.buyQty}" readonly/></label><label>Tempat Beli<select class="place" data-id="${esc(item.id)}"><option ${item.place === 'Online' ? 'selected' : ''}>Online</option><option ${item.place === 'Lotte' ? 'selected' : ''}>Lotte</option><option ${item.place === 'Tokbin' ? 'selected' : ''}>Tokbin</option><option ${item.place === 'RizaPutra' ? 'selected' : ''}>RizaPutra</option></select></label></div></div><div class="preset-wrap"><small>Preset stok</small><div class="preset-row">${[0,25,50,75,100].map(p=>`<button type="button" class="preset-btn" data-id="${esc(item.id)}" data-preset="${p}" ${p!==0 && Number(item.minStock)<=0 ? 'disabled' : ''}>${p}%</button>`).join('')}</div></div></div>`;
 }
 
 function bindRowEvents() {
@@ -533,6 +550,16 @@ function sendWhatsAppAll() {
 function sendWhatsAppByPlace(place) {
   const list = getRecapItemsByPlace(place);
   if (!list.length) return;
+  if (place === 'RizaPutra') {
+    const missing = list.filter((i) => !PRINT_FILE_MAP[i.name]);
+    if (missing.length && !confirm(`Ada ${missing.length} item RizaPutra tanpa link file. Tetap kirim draft WA?`)) return;
+    const title = 'CHECKLIST CETAK SLAKU - RIZAPUTRA';
+    const lines = [title, '', 'ITEM PERLU DICETAK:'];
+    list.forEach((i) => lines.push(`- ${i.name} | Qty: ${i.buyQty} | ${getStockStatus(i).label}`));
+    lines.push('', 'LINK FILE:');
+    list.forEach((i) => lines.push(`- ${i.name} => ${PRINT_FILE_MAP[i.name] || '⚠️ LINK BELUM ADA'}`));
+    return openWhatsAppMessage(lines.join('\n'));
+  }
   const title = `CHECKLIST BELANJA SLAKU - ${place.toUpperCase()}`;
   const lines = [title, ...list.map(i => `- ${i.name} | ${i.buyQty} | pcs | ${getStockStatus(i).label}`)];
   openWhatsAppMessage(lines.join('\n'));
