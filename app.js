@@ -556,6 +556,7 @@ function sendWhatsAppByPlace(place) {
     const lines = ['Halo Kak RizaPutra, izin kirim draft cetak Slaku:', ''];
     list.forEach((i, idx) => {
       lines.push(`${idx + 1}) ${i.name}`);
+      lines.push(`Jumlah: ${i.buyQty} lembar`);
       lines.push(`Link: ${PRINT_FILE_MAP[i.name] || 'BELUM ADA'}`);
       lines.push('');
     });
