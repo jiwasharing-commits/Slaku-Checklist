@@ -287,6 +287,9 @@ const list = document.getElementById('list');
 const recapList = document.getElementById('recapList');
 const summary = document.getElementById('summary');
 const searchInput = document.getElementById('searchInput');
+const placeFilter = document.getElementById('placeFilter');
+const needOnlyFilter = document.getElementById('needOnlyFilter');
+const resetFilterBtn = document.getElementById('resetFilterBtn');
 const importInput = document.getElementById('importInput');
 const recapCard = document.getElementById('recapCard');
 const recapHeader = document.getElementById('recapHeader');
@@ -322,6 +325,14 @@ document.getElementById('backupBtn').onclick = backupJson;
 document.getElementById('importBtn').onclick = () => importInput.click();
 importInput.addEventListener('change', importJson);
 searchInput.addEventListener('input', render);
+placeFilter?.addEventListener('change', render);
+needOnlyFilter?.addEventListener('change', render);
+resetFilterBtn?.addEventListener('click', () => {
+  if (placeFilter) placeFilter.value = 'all';
+  if (needOnlyFilter) needOnlyFilter.checked = false;
+  if (searchInput) searchInput.value = '';
+  render();
+});
 recapHeader?.addEventListener('click', () => { recapUi.mainOpen = !recapUi.mainOpen; saveRecapUi(); renderRecap(); });
 recapCard?.addEventListener('click', (e) => { const btn = e.target.closest('[data-toggle]'); if (!btn) return; const key = btn.getAttribute('data-toggle'); recapUi[key] = !recapUi[key]; saveRecapUi(); renderRecap(); });
 recapCard?.addEventListener('click', (e) => { const btn = e.target.closest('[data-wa-place]'); if (!btn) return; if (btn.disabled) { if (btn.getAttribute('data-wa-place') === 'Online') alert('Tidak ada bahan Online yang perlu dibeli.'); return; } sendWhatsAppByPlace(btn.getAttribute('data-wa-place')); });
@@ -356,8 +367,14 @@ function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
 function render() {
   renderSummary();
   const q = searchInput.value.trim().toLowerCase();
+  const selectedPlace = placeFilter?.value || 'all';
+  const needOnly = !!needOnlyFilter?.checked;
   const grouped = {};
-  items.filter(i => i.name.toLowerCase().includes(q)).forEach(i => ((grouped[i.category] ||= []).push(i)));
+  items
+    .filter((i) => i.name.toLowerCase().includes(q))
+    .filter((i) => selectedPlace === 'all' || i.place === selectedPlace)
+    .filter((i) => !needOnly || needsBuy(i))
+    .forEach((i) => ((grouped[i.category] ||= []).push(i)));
   list.innerHTML = Object.entries(grouped).map(([category, arr]) => `<details open><summary>${esc(category)} (${arr.length})</summary>${arr.map(renderRow).join('')}</details>`).join('') || '<p>Tidak ada item.</p>';
   bindRowEvents();
   renderRecap();
