@@ -51,7 +51,7 @@ const ITEM_CATEGORY_MAP = {
   'Box Ivory 12 x 12 x 5 isi 12': 'Packaging Pendukung',
   'Box Ivory 10 x 10 x 5 isi 12': 'Packaging Pendukung',
   'Baking Paper Basque Cheesecake 4 inch 50 Lembar': 'Packaging Pendukung',
-  'Alas Segitiga cake kecil 10.6x7.2 isi 100 pcs': 'Packaging Pendukung',
+  'Alas Segitiga cake kecil 11.7x7.7 isi 100 pcs': 'Packaging Pendukung',
   'Box Plastik Cup 10 cm isi 12': 'Packaging',
   'Korean Box Slice Isi 10': 'Packaging',
   'Tatakan Kue silver bulat 20 cm - isi 12': 'Packaging',
@@ -131,6 +131,7 @@ const LEGACY_NAME_MAP = {
   'Sticker botol 1 liter Matcha': 'Sticker botol 1 liter Matcha-16x8 cm- A3 -Vinyl+Glossy+cutting',
   'Sticker botol 1 liter Kopi Susu': 'Sticker botol 1 liter Kopi Susu-16x8 cm - A3 -Vinyl+Glossy+cutting',
   'Sticker botol 1 liter Coklat': 'Sticker botol 1 liter Coklat-16x8 cm- A3 - Vinyl+Glossy+cutting',
+  'Alas Segitiga cake kecil 10.6x7.2 isi 100 pcs': 'Alas Segitiga cake kecil 11.7x7.7 isi 100 pcs',
 };
 
 const DEFAULT_MIN_STOCK_MAP = {
@@ -188,7 +189,7 @@ const DEFAULT_MIN_STOCK_MAP = {
   'Box Ivory 12 x 12 x 5 isi 12': 5,
   'Box Ivory 10 x 10 x 5 isi 12': 5,
   'Baking Paper Basque Cheesecake 4 inch 50 Lembar': 5,
-  'Alas Segitiga cake kecil 10.6x7.2 isi 100 pcs': 2,
+  'Alas Segitiga cake kecil 11.7x7.7 isi 100 pcs': 2,
   'Tatakan Kue Bulat 12 cm gold  isi 100': 5,
   'Tatakan Kue bulat 10 cm gold isi 100': 5,
   'Sticker box 18/10 Slaku 4 cm-Kertas A3': 2,
@@ -260,7 +261,7 @@ const DEFAULT_PLACE_MAP = {
   'Box Ivory 12 x 12 x 5 isi 12': 'Online',
   'Box Ivory 10 x 10 x 5 isi 12': 'Online',
   'Baking Paper Basque Cheesecake 4 inch 50 Lembar': 'Online',
-  'Alas Segitiga cake kecil 10.6x7.2 isi 100 pcs': 'Online',
+  'Alas Segitiga cake kecil 11.7x7.7 isi 100 pcs': 'Online',
   'Tatakan Kue Bulat 12 cm gold  isi 100': 'Online',
   'Tatakan Kue bulat 10 cm gold isi 100': 'Online',
   'Sticker box 18/10 Slaku 4 cm-Kertas A3': 'RizaPutra',
@@ -327,7 +328,7 @@ const ONLINE_LINK_MAP = {
   'Plastik Transparan 30x57 200 gram': 'https://shopee.co.id/ARKAPLAS-Plastik-Kantong-Kresek-PE-Bening-Ukuran-10-15-20-24-26-28-30-35-40-i.1206980981.22464120326',
   'Tatakan Kue silver bulat 18 cm - isi 12': 'https://shopee.co.id/(Isi-12-pcs)-Tatakan-Kue-Alas-Kue-Silver-Bulat-Kotak-ukuran-18-20-22-25-30-i.121967354.16786943341',
   'Tatakan Kue silver bulat 20 cm - isi 12': 'https://shopee.co.id/(Isi-12-pcs)-Tatakan-Kue-Alas-Kue-Silver-Bulat-Kotak-ukuran-18-20-22-25-30-i.121967354.16786943341',
-  'Alas Segitiga cake kecil 10.6x7.2 isi 100 pcs': 'https://shopee.co.id/100pcs-Alas-Tatakan-Kue-Gold-Untuk-Slice-Cake-Donut-i.285034286.22876626250?extraParams=%7B%22display_model_id%22%3A146972632243%2C%22model_selection_logic%22%3A2%7D&sp_atk=20f40a66-b067-41c3-b5d4-224ec67f3c00&xptdk=20f40a66-b067-41c3-b5d4-224ec67f3c00',
+  'Alas Segitiga cake kecil 11.7x7.7 isi 100 pcs': 'https://shopee.co.id/100pcs-Alas-Tatakan-Kue-Gold-Untuk-Slice-Cake-Donut-i.285034286.22876626250?extraParams=%7B%22display_model_id%22%3A146972632243%2C%22model_selection_logic%22%3A2%7D&sp_atk=20f40a66-b067-41c3-b5d4-224ec67f3c00&xptdk=20f40a66-b067-41c3-b5d4-224ec67f3c00',
   'Baking Paper Basque Cheesecake 4 inch 50 Lembar': 'https://shopee.co.id/Baking-Paper-Basque-Cheesecake-isi-50-lembar-i.285034286.40411009964',
   'Box Ivory 10 x 10 x 5 isi 12': 'https://shopee.co.id/Box-Ivory-Putih-Laminasi-Jendela-Untuk-Kotak-Brownies-Kue-Roti-Snack-10x10x5-Cm-i.195167048.24711916759',
   'Box Ivory 12 x 12 x 5 isi 12': 'https://shopee.co.id/Box-Ivory-Putih-Laminasi-Jendela-Untuk-Kotak-Brownies-Kue-Roti-Snack-12x12x5-Cm-i.1594535739.40623328927',
